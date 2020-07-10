@@ -1,0 +1,37 @@
+# Docker services
+
+#Alpha
+Traefik
+MariaDB
+influxdb
+Heimdall
+Organizr
+Jackett
+Hydra2
+Radarr
+Sonarr
+Lidarr
+Ubiiquity
+Airsonic
+Bookstack
+Monica
+grafana
+Guacamole
+Home Assistant
+Huginn
+Tautulli
+freshrss
+wikijs
+ombi
+
+
+
+
+###################################################
+###################################################
+##### WhitehomeIO wikijs Docker-Compose File ######
+###################################################
+###################################################
+---
+version: "3"
+services:

@@ -1,0 +1,300 @@
+###################################################
+###################################################
+# WhitehomeIO Services Stack Docker-Compose File ##
+###################################################
+###################################################
+---
+version: "3.3"
+services:
+ mariadb:
+   image: linuxserver/mariadb
+   container_name: mariadb
+   ports:
+     - 3306:3306
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - MYSQL_ROOT_PASSWORD=Ma2ZdORCNYiWzuVh1F
+     - TZ=America/Chicago
+     - MYSQL_DATABASE=dockerdb
+     - MYSQL_USER=dockeruser
+     - MYSQL_PASSWORD=3flwOoleDbyNpJw8Jx4g2IWM
+     - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
+   volumes:
+     - /docker-data/docker-data/mariadb:/config
+   restart: unless-stopped
+
+ traefik:
+  image: traefik:v2.2
+  ports:
+    - 80:80
+    - 443:443
+  deploy:
+    placement:
+      constraints:
+        # Make the traefik service run only on the node with this label
+        # as the node with it has the volume for the certificates
+        - node.labels.traefik-public.traefik-public-certificates == true
+    labels:
+      # Enable Traefik for this service, to make it available in the public network
+      - traefik.enable=true
+      # Use the traefik-public network (declared below)
+      - traefik.docker.network=traefik-public
+      # Use the custom label "traefik.constraint-label=traefik-public"
+      # This public Traefik will only use services with this label
+      # That way you can add other internal Traefik instances per stack if needed
+      - traefik.constraint-label=traefik-public
+      # admin-auth middleware with HTTP Basic auth
+      # Using the environment variables USERNAME and HASHED_PASSWORD
+      - traefik.http.middlewares.admin-auth.basicauth.users=whitehevan:McFnapz4kX2eQEmiMTsesq2y
+      # https-redirect middleware to redirect HTTP to HTTPS
+      # It can be re-used by other stacks in other Docker Compose files
+      - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+      # traefik-http set up only to use the middleware to redirect to https
+      # Uses the environment variable DOMAIN
+      - traefik.http.routers.traefik-public-http.rule=Host(`traefik.int.whitehome.io`)
+      - traefik.http.routers.traefik-public-http.entrypoints=http
+      - traefik.http.routers.traefik-public-http.middlewares=https-redirect
+      # traefik-https the actual router using HTTPS
+      # Uses the environment variable DOMAIN
+      - traefik.http.routers.traefik-public-https.rule=Host(`traefik.int.whitehome.io`)
+      - traefik.http.routers.traefik-public-https.entrypoints=https
+      - traefik.http.routers.traefik-public-https.tls=true
+      # Use the special Traefik service api@internal with the web UI/Dashboard
+      - traefik.http.routers.traefik-public-https.service=api@internal
+      # Use the "le" (Let's Encrypt) resolver created below
+      - traefik.http.routers.traefik-public-https.tls.certresolver=le
+      # Enable HTTP Basic auth, using the middleware created above
+      - traefik.http.routers.traefik-public-https.middlewares=admin-auth
+      # Define the port inside of the Docker service to use
+      - traefik.http.services.traefik-public.loadbalancer.server.port=8080
+  volumes:
+    # Add Docker as a mounted volume, so that Traefik can read the labels of other services
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    # Mount the volume to store the certificates
+    - /docker-data/docker-data/traefik/certs:/certificates
+  command:
+    # Enable Docker in Traefik, so that it reads labels from Docker services
+    - --providers.docker
+    # Add a constraint to only use services with the label "traefik.constraint-label=traefik-public"
+    - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik-public`)
+    # Do not expose all Docker services, only the ones explicitly exposed
+    - --providers.docker.exposedbydefault=false
+    # Enable Docker Swarm mode
+    - --providers.docker.swarmmode
+    # Create an entrypoint "http" listening on address 80
+    - --entrypoints.http.address=:80
+    # Create an entrypoint "https" listening on address 80
+    - --entrypoints.https.address=:443
+    # Create the certificate resolver "le" for Let's Encrypt, uses the environment variable EMAIL
+    - --certificatesresolvers.le.acme.email=thehunterewhite@gmail.com
+    # Store the Let's Encrypt certificates in the mounted volume
+    - --certificatesresolvers.le.acme.storage=/certificates/acme.json
+    # Use the TLS Challenge for Let's Encrypt
+    - --certificatesresolvers.le.acme.tlschallenge=true
+    # Enable the access log, with HTTP requests
+    - --accesslog
+    # Enable the Traefik log, for configurations and errors
+    - --log
+    # Enable the Dashboard and API
+    - --api
+  networks:
+    # Use the public network created to be shared between Traefik and
+    # any other service that needs to be publicly available with HTTPS
+    - traefik-public
+
+ heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    networks:
+      - traefik-public
+    ports:
+      - 4000:80
+      - 4001:443
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /docker-data/docker-data/heimdall:/config
+    restart: unless-stopped
+
+ organizr:
+    image: organizrtools/organizr-v2
+    container_name: organizr-v2
+    networks:
+     - traefik-public
+    ports:
+     - 4002:80
+    environment:
+     - PUID=1000
+     - PGID=1000
+     - TZ=America/Chicago
+    volumes:
+     - /docker-data/docker-data/organizr:/config
+    restart: unless-stopped
+
+ tautulli:
+   image: linuxserver/tautulli
+   container_name: tautulli
+   networks:
+     - traefik-public
+   ports:
+     - 4003:8181
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - TZ=America/Chicago
+   volumes:
+     - tautulli/docker-data/docker-data/tautulli
+     - /docker-data/docker-data/tautulli/logs:/logs
+   restart: unless-stopped
+
+ wikijs:
+   image: linuxserver/wikijs
+   container_name: wikijs
+   networks:
+    - traefik-public
+   ports:
+     - 4010:3000
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - TZ=America/Chicago
+   volumes:
+     - /docker-data/docker-data/wikijs:/config
+     - /docker-data/docker-data/wikijs/data:/data
+   restart: unless-stopped
+
+ freshrss:
+   image: linuxserver/freshrss
+   container_name: freshrss
+   networks:
+    - traefik-public
+   ports:
+     - 4011:80
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - America/Chicago
+   volumes:
+     - /docker-data/docker-data/freshrss:/config
+   restart: unless-stopped
+
+ lidarr:
+    image: linuxserver/lidarr
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - UMASK_SET=022 #optional
+    volumes:
+      - /docker-data/docker-data/lidarr:/config
+      - collector-media:/media
+      - collector-downloads:/downloads
+    ports:
+      - 4004:8686
+    restart: unless-stopped
+
+ radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - UMASK_SET=022 #optional
+    volumes:
+      - /docker-data/docker-data/radarr:/config
+      - collector-media:/media
+      - collector-downloads:/downloads
+    ports:
+      - 4006:7878
+    restart: unless-stopped
+
+ sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - UMASK_SET=022 #optional
+    volumes:
+      - /docker-data/docker-data/sonarr:/config
+      - collector-media:/media
+      - collector-downloads:/downloads
+    ports:
+      - 4005:8989
+    restart: unless-stopped
+
+ jackett:
+   image: linuxserver/jackett
+   container_name: jackett
+   ports:
+     - 4007:9117
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - TZ=America/Chicago
+     - AUTO_UPDATE=true #optional
+     - RUN_OPTS=run options here #optional
+   volumes:
+     - /docker-data/docker-data/jackett:/config
+     - /docker-data/docker-data/jackett/blackhole:/downloads
+   restart: unless-stopped
+
+ ombi:
+   image: linuxserver/ombi
+   container_name: ombi
+   ports:
+     - 4008:3579
+   environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=America/Chicago
+    - BASE_URL=/ombi #optional
+   volumes:
+    - /docker-data/docker-data/ombi:/config
+   restart: unless-stopped
+
+ lazylibrarian:
+    image: linuxserver/lazylibrarian
+    container_name: lazylibrarian
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - DOCKER_MODS=linuxserver/calibre-web:calibre #optional
+    volumes:
+      - /docker-data/docker-data/lazylibrarian:/config
+      - collector-downloads:/downloads
+      - collector-media:/books
+    ports:
+      - 4009:5299
+    restart: unless-stopped
+
+
+volumes:
+  collector-downloads:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/content-gateway/inbox
+      o: bind
+
+  collector-media:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/media/
+      o: bind
+
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

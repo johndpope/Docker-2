@@ -1,0 +1,66 @@
+###################################################
+###################################################
+#### WhitehomeIO Web Stack Docker-Compose File ####
+###################################################
+###################################################
+---
+version: "3.3"
+services:
+ wikijs:
+   image: linuxserver/wikijs
+   container_name: wikijs
+   networks:
+    - traefik-public
+   ports:
+     - 4010:3000
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - TZ=America/Chicago
+   volumes:
+     - wikijs:/config
+     - wikijs-data:/data
+   restart: unless-stopped
+
+ freshrss:
+   image: linuxserver/freshrss
+   container_name: freshrss
+   networks:
+    - traefik-public
+   ports:
+     - 4011:80
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - America/Chicago
+   volumes:
+     - freshrss:/config
+   restart: unless-stopped
+
+
+volumes:
+  wikijs:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/docker-data/wikijs
+      o: bind
+
+  wikijs-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/docker-data/wikijs/data
+      o: bind
+
+  freshrss:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/docker-data/freshrss
+      o: bind
+
+
+networks:
+  traefik-public:
+    external: true
