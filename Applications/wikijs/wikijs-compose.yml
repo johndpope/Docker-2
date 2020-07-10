@@ -1,0 +1,37 @@
+###################################################
+###################################################
+##### WhitehomeIO wikijs Docker-Compose File ######
+###################################################
+###################################################
+---
+version: "3.3"
+services:
+ wikijs:
+   image: linuxserver/wikijs
+   container_name: wikijs
+   ports:
+     - 4009:3000
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - TZ=America/Chicago
+   volumes:
+     - wikijs:/config
+     - wikijs-data:/data
+   restart: unless-stopped
+
+
+volumes:
+  wikijs:
+    driver: local
+    driver_opts:
+      type: none
+      device: /nfs/docker-data/wikijs
+      o: bind
+
+  wikijs-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /nfs/docker-data/wikijs/data
+      o: bind

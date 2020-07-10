@@ -1,0 +1,30 @@
+###################################################
+###################################################
+#### WhitehomeIO heimdall Docker-Compose File #####
+###################################################
+###################################################
+---
+version: "3.3"
+services:
+ heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    ports:
+      - 4004:80
+      - 4005:443
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - heimdall:/config
+    restart: unless-stopped
+
+
+volumes:
+  heimdall:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/docker-data/heimdall
+      o: bind

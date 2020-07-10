@@ -1,0 +1,28 @@
+###################################################
+###################################################
+#### WhitehomeIO freshrss Docker-Compose File #####
+###################################################
+###################################################
+---
+version: "3.3"
+services:
+ freshrss:
+   image: linuxserver/freshrss
+   container_name: freshrss
+   ports:
+     - 4006:80
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - America/Chicago
+   volumes:
+     - freshrss:/config
+   restart: unless-stopped
+
+volumes:
+  freshrss:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/docker-data/freshrss
+      o: bind

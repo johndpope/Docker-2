@@ -1,0 +1,46 @@
+###################################################
+###################################################
+##### WhitehomeIO Radarr Docker-Compose File ######
+###################################################
+###################################################
+---
+version: "3.3"
+services:
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - UMASK_SET=022 #optional
+    volumes:
+      - radarr:/config
+      - collector-media:/media
+      - collector-downloads:/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+
+volumes:
+  collector-downloads:
+    driver: local
+    driver_opts:
+      type: none
+      device: /nfs/content-gateway/inbox
+      o: bind
+
+  collector-media:
+    driver: local
+    driver_opts:
+      type: none
+      device: /nfs/media/
+      o: bind
+
+  radarr:
+    driver: local
+    driver_opts:
+      type: none
+      device: /nfs/docker-data/radarr
+      o: bind

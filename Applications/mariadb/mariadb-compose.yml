@@ -1,0 +1,34 @@
+###################################################
+###################################################
+##### WhitehomeIO MariaDB Docker-Compose File #####
+###################################################
+###################################################
+---
+version: '3.3'
+services:
+ mariadb:
+   image: linuxserver/mariadb
+   container_name: mariadb
+   ports:
+     - 3306:3306
+   environment:
+     - PUID=1000
+     - PGID=1000
+     - MYSQL_ROOT_PASSWORD=Ma2ZdORCNYiWzuVh1F
+     - TZ=America/Chicago
+     - MYSQL_DATABASE=dockerdb
+     - MYSQL_USER=dockeruser
+     - MYSQL_PASSWORD=3flwOoleDbyNpJw8Jx4g2IWM
+     - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
+   volumes:
+     - mariadb:/config
+   restart: unless-stopped
+
+
+volumes:
+  mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/docker-data/mariadb
+      o: bind
