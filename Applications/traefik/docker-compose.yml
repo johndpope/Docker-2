@@ -51,7 +51,7 @@ services:
     # Add Docker as a mounted volume, so that Traefik can read the labels of other services
     - /var/run/docker.sock:/var/run/docker.sock:ro
     # Mount the volume to store the certificates
-    - traefik-certs:/certificates
+    - /docker-data/traefik/certs:/certificates
   command:
     # Enable Docker in Traefik, so that it reads labels from Docker services
     - --providers.docker
@@ -60,7 +60,7 @@ services:
     # Do not expose all Docker services, only the ones explicitly exposed
     - --providers.docker.exposedbydefault=false
     # Enable Docker Swarm mode
-    - --providers.docker.swarmmode
+#    - --providers.docker.swarmmode
     # Create an entrypoint "http" listening on address 80
     - --entrypoints.http.address=:80
     # Create an entrypoint "https" listening on address 80
@@ -81,18 +81,6 @@ services:
     # Use the public network created to be shared between Traefik and
     # any other service that needs to be publicly available with HTTPS
     - traefik-public
-
-
-volumes:
-  # Create a volume to store the certificates, there is a constraint to make sure
-  # Traefik is always deployed to the same Docker node with the same volume containing
-  # the HTTPS certificates
- traefik-certs:
-  driver: local
-  driver_opts:
-    type: none
-    device: /nfs/docker-data/traefik/certs
-    o: bind
 
 
 networks:
