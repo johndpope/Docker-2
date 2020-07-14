@@ -4,26 +4,27 @@
 ###################################################
 ###################################################
 ---
-version: '3.3'
+version: '3.7'
 services:
  ombi:
-  image: linuxserver/ombi
-  container_name: ombi
-  ports:
-     - 4001:3579
-  environment:
+   image: linuxserver/ombi
+   container_name: ombi
+   networks:
+    - traefik-public
+   ports:
+     - 4008:3579
+   environment:
     - PUID=1000
     - PGID=1000
     - TZ=America/Chicago
     - BASE_URL=/ombi #optional
-  volumes:
-    - ombi:/config
-  restart: unless-stopped
+   volumes:
+    - /docker-data/ombi:/config
+   restart: unless-stopped
 
-volumes:
-  ombi:
-    driver: local
-    driver_opts:
-      type: none
-      device: /nfs/docker-data/ombi
-      o: bind
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

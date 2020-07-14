@@ -4,9 +4,9 @@
 ###################################################
 ###################################################
 ---
-version: "3.3"
+version: "3.7"
 services:
-  sonarr:
+ sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
     environment:
@@ -15,31 +15,32 @@ services:
       - TZ=America/Chicago
       - UMASK_SET=022 #optional
     volumes:
-      - sonarr:/config
+      - /docker-data/sonarr:/config
       - collector-media:/media
       - collector-downloads:/downloads
     ports:
-      - 8989:8989
+      - 4005:8989
     restart: unless-stopped
+
 
 volumes:
   collector-downloads:
     driver: local
     driver_opts:
       type: none
-      device: /nfs/content-gateway/inbox
+      device: /smb/content-gateway/inbox
       o: bind
 
   collector-media:
     driver: local
     driver_opts:
       type: none
-      device: /nfs/media/
+      device: /smb/media/
       o: bind
 
-  sonarr:
-    driver: local
-    driver_opts:
-      type: none
-      device: /nfs/docker-data/sonarr
-      o: bind
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

@@ -4,7 +4,7 @@
 ###################################################
 ###################################################
 ---
-version: '3.3'
+version: "3.7"
 services:
  mariadb:
    image: linuxserver/mariadb
@@ -21,14 +21,12 @@ services:
      - MYSQL_PASSWORD=3flwOoleDbyNpJw8Jx4g2IWM
      - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
    volumes:
-     - mariadb:/config
+     - /docker-data/mariadb:/config
    restart: unless-stopped
 
 
-volumes:
-  mariadb:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/docker-data/mariadb
-      o: bind
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

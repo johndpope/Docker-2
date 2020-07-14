@@ -4,34 +4,27 @@
 ###################################################
 ###################################################
 ---
-version: "3.3"
+version: "3.7"
 services:
  wikijs:
    image: linuxserver/wikijs
    container_name: wikijs
+   networks:
+    - traefik-public
    ports:
-     - 4009:3000
+     - 4010:3000
    environment:
      - PUID=1000
      - PGID=1000
      - TZ=America/Chicago
    volumes:
-     - wikijs:/config
-     - wikijs-data:/data
+     - /docker-data/wikijs:/config
+     - /docker-data/wikijs/data:/data
    restart: unless-stopped
 
 
-volumes:
-  wikijs:
-    driver: local
-    driver_opts:
-      type: none
-      device: /nfs/docker-data/wikijs
-      o: bind
-
-  wikijs-data:
-    driver: local
-    driver_opts:
-      type: none
-      device: /nfs/docker-data/wikijs/data
-      o: bind
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

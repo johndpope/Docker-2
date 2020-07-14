@@ -11,7 +11,9 @@ services:
   ports:
     - 80:80
     - 443:443
+
   restart: unless-stopped
+
 #  deploy:
 #    placement:
 #      constraints:
@@ -29,7 +31,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
         # HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
-      - "traefik.frontend.rule=Host:(`traefik.int.whitehome.io`)"
+      - "traefik.frontend.rule=Host:(`traefik.int.whitehome.io`); PathPrefixStrip: /traefik"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.int.whitehome.io`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
       - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
@@ -93,6 +95,37 @@ services:
   environment:
       - CF_API_EMAIL=thehunterewhite@gmail.com
       - CF_API_KEY=50ec1fbb9e5c03448d6b2805fe45182df26a8
+
+ heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    networks:
+      - traefik-public
+    ports:
+      - 4000:80
+      - 4001:443
+    restart: unless-stopped
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nextcloud-http.entrypoints=web
+      - traefik.http.routers.nextcloud-http.rule=Host(`heimdall.int.whitehome.io`)
+      - traefik.http.routers.nextcloud-https.entrypoints=websecure
+      - traefik.http.routers.nextcloud-https.rule=Host(`heimdall.int.whitehome.io`)
+      - traefik.http.routers.nextcloud-https.tls=true
+      - traefik.http.routers.nextcloud-https.tls.certresolver=default
+      - traefik.http.routers.nextcloud-http.middlewares=nextcloud-https@docker
+      - traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.nextcloud-https.redirectScheme.permanent=true
+      
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+
+    volumes:
+      - /docker-data/heimdall:/config
+
 
 
 networks:
