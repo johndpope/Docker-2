@@ -1,0 +1,23 @@
+---
+version: '3'
+services:
+  homeassistant:
+    image: homeassistant/home-assistant:stable
+    container_name: home-assistant
+    ports:
+      - 4013:3000
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /docker-data/homeassistant:/config
+    restart: always
+
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true
