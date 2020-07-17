@@ -1,35 +1,26 @@
 ###################################################
 ###################################################
-##### WhitehomeIO Hydra2 Docker-Compose File ######
+#### WhitehomeIO Tautulli Docker-Compose File #####
 ###################################################
 ###################################################
 ---
 version: "3.7"
 services:
-  hydra2:
-    image: linuxserver/hydra2
-    container_name: hydra2
+  tautulli:
+    image: linuxserver/tautulli
+    container_name: tautulli
     networks:
-     - traefik-public
+      - traefik-public
     ports:
-      - 4012:5076
+      - 4003:8181
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - /docker-data/hydra2:/config
-      - collector-nzb:/downloads
+      - tautulli/docker-data/tautulli
+      - /docker-data/tautulli/logs:/logs
     restart: unless-stopped
-
-
-volumes:
-  collector-nzb:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/content-gateway/local inbox/nzbget/completed
-      o: bind
 
 
 networks:

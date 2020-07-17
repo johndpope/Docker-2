@@ -4,23 +4,26 @@ ls###################################################
 ###################################################
 ###################################################
 ---
-version: "3.3"
+version: "3.7"
 services:
   lidarr:
     image: linuxserver/lidarr
     container_name: lidarr
+    networks:
+     - traefik-public
+    ports:
+      - 4004:8686
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
       - UMASK_SET=022 #optional
     volumes:
-      - lidarr:/config
+      - /docker-data/lidarr:/config
       - collector-media:/media
       - collector-downloads:/downloads
-    ports:
-      - 8686:8686
     restart: unless-stopped
+
 
 volumes:
   collector-downloads:
@@ -37,9 +40,9 @@ volumes:
       device: /smb/media/
       o: bind
 
-  lidarr:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/docker-data/lidarr
-      o: bind
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

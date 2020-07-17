@@ -4,26 +4,26 @@
 ###################################################
 ###################################################
 ---
-version: "3.3"
+version: "3.7"
 services:
- organizr:
-   image: organizrtools/organizr-v2
-   container_name: organizr-v2
-   ports:
-     - 4007:80
-   environment:
-     - PUID=1000
-     - PGID=1000
-     - TZ=America/Chicago
-   volumes:
-     - organizr:/config
-   restart: unless-stopped
+  organizr:
+    image: organizrtools/organizr-v2
+    container_name: organizr-v2
+    networks:
+      - traefik-public
+    ports:
+      - 4002:80
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /docker-data/organizr:/config
+    restart: unless-stopped
 
 
-volumes:
- organizr:
-  driver: local
-  driver_opts:
-    type: none
-    device: /nfs/docker-data/organizr
-    o: bind
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

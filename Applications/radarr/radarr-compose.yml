@@ -4,22 +4,22 @@
 ###################################################
 ###################################################
 ---
-version: "3.3"
+version: "3.7"
 services:
   radarr:
     image: linuxserver/radarr
     container_name: radarr
+    ports:
+      - 4006:7878
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
       - UMASK_SET=022 #optional
     volumes:
-      - radarr:/config
+      - /docker-data/radarr:/config
       - collector-media:/media
       - collector-downloads:/downloads
-    ports:
-      - 7878:7878
     restart: unless-stopped
 
 
@@ -28,19 +28,19 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /nfs/content-gateway/inbox
+      device: /smb/content-gateway/inbox
       o: bind
 
   collector-media:
     driver: local
     driver_opts:
       type: none
-      device: /nfs/media/
+      device: /smb/media/
       o: bind
 
-  radarr:
-    driver: local
-    driver_opts:
-      type: none
-      device: /nfs/docker-data/radarr
-      o: bind
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true

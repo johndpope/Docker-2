@@ -1,35 +1,28 @@
 ###################################################
 ###################################################
-##### WhitehomeIO Hydra2 Docker-Compose File ######
+#### WhitehomeIO jackett Docker-Compose File ######
 ###################################################
 ###################################################
 ---
 version: "3.7"
 services:
-  hydra2:
-    image: linuxserver/hydra2
-    container_name: hydra2
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
     networks:
      - traefik-public
     ports:
-      - 4012:5076
+      - 4007:9117
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS=run options here #optional
     volumes:
-      - /docker-data/hydra2:/config
-      - collector-nzb:/downloads
+      - /docker-data/jackett:/config
+      - /docker-data/jackett/blackhole:/downloads
     restart: unless-stopped
-
-
-volumes:
-  collector-nzb:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/content-gateway/local inbox/nzbget/completed
-      o: bind
 
 
 networks:
