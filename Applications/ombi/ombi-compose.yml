@@ -6,21 +6,21 @@
 ---
 version: '3.7'
 services:
- ombi:
-   image: linuxserver/ombi
-   container_name: ombi
-   networks:
-    - traefik-public
-   ports:
-     - 4008:3579
-   environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=America/Chicago
-    - BASE_URL=/ombi #optional
-   volumes:
-    - /docker-data/ombi:/config
-   restart: unless-stopped
+  ombi:
+    image: linuxserver/ombi
+    container_name: ombi
+    networks:
+      - traefik-public
+    ports:
+      - 4008:3579
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - BASE_URL=/ombi #optional
+    volumes:
+     - /docker-data/ombi:/config
+    restart: unless-stopped
 
 
 networks:

@@ -6,21 +6,21 @@
 ---
 version: "3.7"
 services:
- tautulli:
-   image: linuxserver/tautulli
-   container_name: tautulli
-   networks:
-     - traefik-public
-   ports:
-     - 4003:8181
-   environment:
-     - PUID=1000
-     - PGID=1000
-     - TZ=America/Chicago
-   volumes:
-     - tautulli/docker-data/tautulli
-     - /docker-data/tautulli/logs:/logs
-   restart: unless-stopped
+  tautulli:
+    image: linuxserver/tautulli
+    container_name: tautulli
+    networks:
+      - traefik-public
+    ports:
+      - 4003:8181
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - tautulli/docker-data/tautulli
+      - /docker-data/tautulli/logs:/logs
+    restart: unless-stopped
 
 
 networks:

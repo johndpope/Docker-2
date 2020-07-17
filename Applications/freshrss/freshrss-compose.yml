@@ -7,19 +7,19 @@
 version: "3.7"
 services:
  freshrss:
-   image: linuxserver/freshrss
-   container_name: freshrss
-   networks:
-    - traefik-public
-   ports:
+    image: linuxserver/freshrss
+    container_name: freshrss
+    networks:
+     - traefik-public
+    ports:
      - 4011:80
-   environment:
-     - PUID=1000
-     - PGID=1000
-     - TZ=America/Chicago
-   volumes:
-     - /docker-data/freshrss:/config
-   restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /docker-data/freshrss:/config
+    restart: unless-stopped
 
 
 networks:

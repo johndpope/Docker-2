@@ -1,12 +1,7 @@
-###################################################
-###################################################
-#### WhitehomeIO heimdall Docker-Compose File #####
-###################################################
-###################################################
 ---
 version: "3.7"
 services:
- heimdall:
+  heimdall:
     image: linuxserver/heimdall
     container_name: heimdall
     networks:
@@ -14,6 +9,15 @@ services:
     ports:
       - 4000:80
       - 4001:443
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.heimdall-http.entrypoints=http
+      - traefik.http.routers.heimdall-http.rule=Host(`heimdall.int.whitehome.io`)
+      - traefik.http.routers.heimdall-https.entrypoints=https
+      - traefik.http.routers.heimdall-https.rule=Host(`heimdall.int.whitehome.io`)
+      - traefik.http.routers.heimdall-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
@@ -21,7 +25,6 @@ services:
     volumes:
       - /docker-data/heimdall:/config
     restart: unless-stopped
-
 
 networks:
   # Use the previously created public network "traefik-public", shared with other

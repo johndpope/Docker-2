@@ -6,7 +6,7 @@
 ---
 version: "3.7"
 services:
- radarr:
+  radarr:
     image: linuxserver/radarr
     container_name: radarr
     ports:

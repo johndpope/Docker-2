@@ -1,14 +1,13 @@
-###################################################
-###################################################
-##### WhitehomeIO Sonarr Docker-Compose File ######
-###################################################
-###################################################
 ---
 version: "3.7"
 services:
- sonarr:
+  sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
+    networks:
+      - traefik-public
+    ports:
+      - 4005:8989
     environment:
       - PUID=1000
       - PGID=1000
@@ -18,8 +17,6 @@ services:
       - /docker-data/sonarr:/config
       - collector-media:/media
       - collector-downloads:/downloads
-    ports:
-      - 4005:8989
     restart: unless-stopped
 
 

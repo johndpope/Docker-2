@@ -6,9 +6,11 @@ ls###################################################
 ---
 version: "3.7"
 services:
- lidarr:
+  lidarr:
     image: linuxserver/lidarr
     container_name: lidarr
+    networks:
+     - traefik-public
     ports:
       - 4004:8686
     environment:

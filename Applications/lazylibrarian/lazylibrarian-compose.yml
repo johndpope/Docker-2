@@ -1,9 +1,13 @@
 ---
 version: '3.7'
 services:
- lazylibrarian:
+  lazylibrarian:
     image: linuxserver/lazylibrarian
     container_name: lazylibrarian
+    networks:
+     - traefik-public
+    ports:
+      - 4009:5299
     environment:
       - PUID=1000
       - PGID=1000
@@ -13,8 +17,6 @@ services:
       - /docker-data/lazylibrarian:/config
       - collector-downloads:/downloads
       - collector-media:/books
-    ports:
-      - 4009:5299
     restart: unless-stopped
 
 

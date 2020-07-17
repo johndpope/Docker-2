@@ -6,23 +6,23 @@
 ---
 version: "3.7"
 services:
- jackett:
-   image: linuxserver/jackett
-   container_name: jackett
-   networks:
-    - traefik-public
-   ports:
-     - 4007:9117
-   environment:
-     - PUID=1000
-     - PGID=1000
-     - TZ=America/Chicago
-     - AUTO_UPDATE=true #optional
-     - RUN_OPTS=run options here #optional
-   volumes:
-     - /docker-data/jackett:/config
-     - /docker-data/jackett/blackhole:/downloads
-   restart: unless-stopped
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    networks:
+     - traefik-public
+    ports:
+      - 4007:9117
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS=run options here #optional
+    volumes:
+      - /docker-data/jackett:/config
+      - /docker-data/jackett/blackhole:/downloads
+    restart: unless-stopped
 
 
 networks:

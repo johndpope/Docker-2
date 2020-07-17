@@ -4,35 +4,36 @@
 ###################################################
 ###################################################
 ---
-version: "3.3"
+version: "3.7"
 services:
   hydra2:
     image: linuxserver/hydra2
     container_name: hydra2
+    networks:
+     - traefik-public
+    ports:
+      - 4012:5076
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - hydra2:/config
+      - /docker-data/hydra2:/config
       - collector-nzb:/downloads
-    ports:
-      - 5076:5076
     restart: unless-stopped
 
 
 volumes:
-
-  hydra2:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/docker-data/hydra2
-      o: bind
-
   collector-nzb:
     driver: local
     driver_opts:
       type: none
       device: /smb/content-gateway/local inbox/nzbget/completed
       o: bind
+
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true
