@@ -3,8 +3,7 @@
 # This contains a rough outline of the sections I use to build and configure
 # docker-compose files for individual applications. The file has a rough
 # docker-compose file that contains things that are more or less universal
-# in all of my compose files. Things such as Traefik labels and shared
-# values.
+# in all of my compose files. Things such as Traefik labels and shared values
 
 ###################################################
 ###################################################
