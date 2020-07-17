@@ -10,21 +10,30 @@ services:
     image: linuxserver/tautulli
     container_name: tautulli
     networks:
-      - traefik-public
+     - traefik-public
+     - traefik-internal
     ports:
       - 4003:8181
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.lidarr-http.entrypoints=http
+      - traefik.http.routers.lidarr-http.rule=Host(`lidarr.int.whitehome.io`)
+      - traefik.http.routers.lidarr-https.entrypoints=https
+      - traefik.http.routers.lidarr-https.rule=Host(`lidarr.int.whitehome.io`)
+      - traefik.http.routers.lidarr-https.tls=true
+      - traefik.docker.network=traefik-internal
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - tautulli/docker-data/tautulli
+      - /docker-data/tautulli:/config
       - /docker-data/tautulli/logs:/logs
     restart: unless-stopped
 
-
 networks:
-  # Use the previously created public network "traefik-public", shared with other
-  # services that need to be publicly available via this Traefik
   traefik-public:
     external: true
+  traefik-internal:
+    external: false

@@ -1,12 +1,26 @@
 ---
-version: '3'
+version: '3.7'
 services:
   homeassistant:
     image: homeassistant/home-assistant:stable
     container_name: home-assistant
+    networks:
+     - traefik-public
+     - traefik-internal
     ports:
-      - 4013:3000
-    network_mode: host
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.homeassistant-http.entrypoints=http
+      - traefik.http.routers.homeassistant-http.rule=Host(`homeassistant.int.whitehome.io`)
+      - traefik.http.routers.homeassistant-https.entrypoints=https
+      - traefik.http.routers.homeassistant-https.rule=Host(`homeassistant.int.whitehome.io`)
+      - traefik.http.routers.homeassistant-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
@@ -15,9 +29,8 @@ services:
       - /docker-data/homeassistant:/config
     restart: always
 
-
 networks:
-  # Use the previously created public network "traefik-public", shared with other
-  # services that need to be publicly available via this Traefik
   traefik-public:
     external: true
+  traefik-internal:
+    external: false

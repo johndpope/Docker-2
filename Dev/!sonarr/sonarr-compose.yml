@@ -5,9 +5,19 @@ services:
     image: linuxserver/sonarr
     container_name: sonarr
     networks:
-      - traefik-public
+     - traefik-public
+     - traefik-internal
     ports:
       - 4005:8989
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.sonarr-http.entrypoints=http
+      - traefik.http.routers.sonarr-http.rule=Host(`sonarr.int.whitehome.io`)
+      - traefik.http.routers.sonarr-https.entrypoints=https
+      - traefik.http.routers.sonarr-https.rule=Host(`sonarr.int.whitehome.io`)
+      - traefik.http.routers.sonarr-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
@@ -19,25 +29,22 @@ services:
       - collector-downloads:/downloads
     restart: unless-stopped
 
-
 volumes:
-  collector-downloads:
+  nova-downloads:
     driver: local
     driver_opts:
       type: none
-      device: /smb/content-gateway/inbox
+      device: /smb/content-gateway/
       o: bind
-
-  collector-media:
+  nova-media:
     driver: local
     driver_opts:
       type: none
       device: /smb/media/
       o: bind
 
-
 networks:
-  # Use the previously created public network "traefik-public", shared with other
-  # services that need to be publicly available via this Traefik
   traefik-public:
     external: true
+  traefik-internal:
+    external: false

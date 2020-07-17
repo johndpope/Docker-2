@@ -1,16 +1,23 @@
-###################################################
-###################################################
-##### WhitehomeIO Radarr Docker-Compose File ######
-###################################################
-###################################################
 ---
 version: "3.7"
 services:
   radarr:
     image: linuxserver/radarr
     container_name: radarr
+    networks:
+     - traefik-public
+     - traefik-internal
     ports:
       - 4006:7878
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.radarr-http.entrypoints=http
+      - traefik.http.routers.radarr-http.rule=Host(`radarr.int.whitehome.io`)
+      - traefik.http.routers.radarr-https.entrypoints=https
+      - traefik.http.routers.radarr-https.rule=Host(`radarr.int.whitehome.io`)
+      - traefik.http.routers.radarr-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
@@ -18,26 +25,23 @@ services:
       - UMASK_SET=022 #optional
     volumes:
       - /docker-data/radarr:/config
-      - collector-media:/media
-      - collector-downloads:/downloads
+      - nova-media:/media
+      - nova-downloads:/downloads
     restart: unless-stopped
 
-
 volumes:
-  collector-downloads:
+  nova-downloads:
     driver: local
     driver_opts:
       type: none
-      device: /smb/content-gateway/inbox
+      device: /smb/content-gateway/
       o: bind
-
-  collector-media:
+  nova-media:
     driver: local
     driver_opts:
       type: none
       device: /smb/media/
       o: bind
-
 
 networks:
   # Use the previously created public network "traefik-public", shared with other
