@@ -67,7 +67,6 @@ volumes: #volume mapping for shared folder/binds
       device: /smb/$path #local SMB mount path
       o: bind
 
-
 networks: #Network mappings for applications
   traefik-public: #traefik network for exposed services
     external: true

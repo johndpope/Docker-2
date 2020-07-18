@@ -1,8 +1,3 @@
-###################################################
-###################################################
-#### WhitehomeIO jackett Docker-Compose File ######
-###################################################
-###################################################
 ---
 version: "3.7"
 services:
@@ -13,6 +8,15 @@ services:
      - traefik-public
     ports:
       - 4007:9117
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.jackett-http.entrypoints=http
+      - traefik.http.routers.jackett-http.rule=Host(`jackett.int.whitehome.io`)
+      - traefik.http.routers.jackett-https.entrypoints=https
+      - traefik.http.routers.jackett-https.rule=Host(`jackett.int.whitehome.io`)
+      - traefik.http.routers.jackett-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
