@@ -1,8 +1,3 @@
-###################################################
-###################################################
-##### WhitehomeIO wikijs Docker-Compose File ######
-###################################################
-###################################################
 ---
 version: "3.7"
 services:
@@ -10,9 +5,19 @@ services:
     image: linuxserver/wikijs
     container_name: wikijs
     networks:
-      - traefik-public
+     - traefik-public
+     - traefik-internal
     ports:
       - 4010:3000
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.wikijs-http.entrypoints=http
+      - traefik.http.routers.wikijs-http.rule=Host(`wikijs.int.whitehome.io`)
+      - traefik.http.routers.wikijs-https.entrypoints=https
+      - traefik.http.routers.wikijs-https.rule=Host(`wikijs.int.whitehome.io`)
+      - traefik.http.routers.wikijs-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
@@ -22,9 +27,8 @@ services:
       - /docker-data/wikijs/data:/data
     restart: unless-stopped
 
-
 networks:
-  # Use the previously created public network "traefik-public", shared with other
-  # services that need to be publicly available via this Traefik
   traefik-public:
     external: true
+  traefik-internal:
+    external: false

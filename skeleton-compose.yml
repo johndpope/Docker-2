@@ -1,0 +1,77 @@
+## Docker-compose skeleton template ##
+
+# This contains a rough outline of the sections I use to build and configure
+# docker-compose files for individual applications. The file has a rough
+# docker-compose file that contains things that are more or less universal
+# in all of my compose files. Things such as Traefik labels and shared values
+
+###################################################
+###################################################
+##### WhitehomeIO wikijs Docker-Compose File ######
+###################################################
+###################################################
+
+##################################################
+##################################################
+
+# The skeleton's bones
+---
+version: "3.7"
+services:
+  $Service:
+    image: $image
+    container_name: $name
+    networks:
+      - $network00
+      - $network01
+    ports:
+      - $port:80
+    labels:
+      - $labels
+    environment:
+      - $environments
+    volumes:
+      - $filepath:/config
+    restart: unless-stopped
+
+##################################################
+
+  Application: #Application to deploy
+    image: linuxserver/ #The image to pull
+    container_name: #Name of container ------ Depreciated, but I still keep
+    networks: #Docker networks to communicate on
+     - traefik-internal #The Traefik network for all apps NOT exposed
+     - traefik-public #The Traefik network for all apps TO expose
+    ports: #Host/Docker port mappings
+      - 4004:8686 #hostport:containerport
+    labels: # Labels assigned to the applications
+      - traefik.enable=true #Enables Traefik to interact
+      - traefik.constraint-label=traefik-public #Traefik constraint filter
+      - traefik.http.routers.$REPLACE-http.entrypoints=http #http Traefik ingress
+      - traefik.http.routers.$REPLACE-http.rule=Host(`$REPLACE.int.whitehome.io`) #http hostname
+      - traefik.http.routers.$REPLACE-https.entrypoints=https #https Traefik ingress
+      - traefik.http.routers.$REPLACE-https.rule=Host(`$REPLACE.int.whitehome.io`) #https hostname
+      - traefik.http.routers.$REPLACE-https.tls=true #Traefik enable TLS SSL
+      - traefik.docker.network=traefik-public #Traefik network application uses to communicate
+    environments: #Environmental values set for the applications
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago #Timezone
+    restart: unless-stopped #runtime policy
+
+volumes: #volume mapping for shared folder/binds
+  $volumename: #Name of volumes
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/$path #local SMB mount path
+      o: bind
+
+networks: #Network mappings for applications
+  traefik-public: #traefik network for exposed services
+    external: true
+  traefik-internal: #Traefik network for internal only services
+    external: false
+
+##################################################
+##################################################

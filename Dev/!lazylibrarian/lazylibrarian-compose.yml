@@ -8,6 +8,15 @@ services:
      - traefik-public
     ports:
       - 4009:5299
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.lazylibrarian-http.entrypoints=http
+      - traefik.http.routers.lazylibrarian-http.rule=Host(`lazylibrarian.int.whitehome.io`)
+      - traefik.http.routers.lazylibrarian-https.entrypoints=https
+      - traefik.http.routers.lazylibrarian-https.rule=Host(`lazylibrarian.int.whitehome.io`)
+      - traefik.http.routers.lazylibrarian-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
@@ -15,29 +24,28 @@ services:
       - DOCKER_MODS=linuxserver/calibre-web:calibre #optional
     volumes:
       - /docker-data/lazylibrarian:/config
-      - collector-downloads:/downloads
-      - collector-media:/books
+      - nova-downloads:/downloads
+      - nova-media:/books
     restart: unless-stopped
 
 
 volumes:
-  collector-downloads:
+  nova-downloads:
     driver: local
     driver_opts:
       type: none
       device: /smb/content-gateway/inbox
       o: bind
 
-  collector-media:
+  nova-media:
     driver: local
     driver_opts:
       type: none
       device: /smb/media/
       o: bind
 
-
 networks:
-  # Use the previously created public network "traefik-public", shared with other
-  # services that need to be publicly available via this Traefik
   traefik-public:
     external: true
+  traefik-internal:
+    external: false

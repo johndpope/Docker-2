@@ -1,15 +1,33 @@
 ---
-version: "2.1"
+version: "3.7"
 services:
   grocy:
     image: linuxserver/grocy
     container_name: grocy
+    networks:
+      - traefik-public
+      - traefik-internal
+    ports:
+      - 9283:80
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.grocy-http.entrypoints=http
+      - traefik.http.routers.grocy-http.rule=Host(`grocy.int.whitehome.io`)
+      - traefik.http.routers.grocy-https.entrypoints=https
+      - traefik.http.routers.grocy-https.rule=Host(`grocy.int.whitehome.io`)
+      - traefik.http.routers.grocy-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=your timezone, eg Europe/London
+      - TZ=America/Chicago
     volumes:
-      - path to data:/config
-    ports:
-      - 9283:80
+      - /docker-data/grocy:/config
     restart: unless-stopped
+
+networks:
+  traefik-public:
+    external: true
+  traefik-internal:
+    external: false

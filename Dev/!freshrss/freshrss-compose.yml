@@ -1,18 +1,23 @@
-###################################################
-###################################################
-#### WhitehomeIO freshrss Docker-Compose File #####
-###################################################
-###################################################
 ---
 version: "3.7"
 services:
- freshrss:
+  freshrss:
     image: linuxserver/freshrss
     container_name: freshrss
     networks:
      - traefik-public
+     - traefik-internal
     ports:
      - 4011:80
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.freshrss-http.entrypoints=http
+      - traefik.http.routers.freshrss-http.rule=Host(`freshrss.int.whitehome.io`)
+      - traefik.http.routers.freshrss-https.entrypoints=https
+      - traefik.http.routers.freshrss-https.rule=Host(`freshrss.int.whitehome.io`)
+      - traefik.http.routers.freshrss-https.tls=true
+      - traefik.docker.network=traefik-public
     environment:
       - PUID=1000
       - PGID=1000
@@ -21,9 +26,8 @@ services:
       - /docker-data/freshrss:/config
     restart: unless-stopped
 
-
 networks:
-  # Use the previously created public network "traefik-public", shared with other
-  # services that need to be publicly available via this Traefik
   traefik-public:
     external: true
+  traefik-internal:
+    external: false
