@@ -5,7 +5,6 @@ services:
     image: traefik:v2.2
     networks:
       - traefik-public
-      - traefik-internal
     ports:
       - target: 80
         published: 80
@@ -38,7 +37,7 @@ services:
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.int.whitehome.io`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
-      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
+#      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       - "traefik.http.routers.traefik-rtr.tls.domains[0].main=whitehome.io"
       - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.whitehome.io"
 #      - traefik.http.routers.traefik-rtr.tls.domains[1].main=whitehome.io
@@ -88,4 +87,3 @@ services:
 networks:
   traefik-public:
     external: true
-  traefik-internal:
