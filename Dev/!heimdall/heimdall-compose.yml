@@ -13,12 +13,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
       - traefik.http.routers.heimdall-http.entrypoints=http
       - traefik.http.routers.heimdall-http.rule=Host(`heimdall.int.whitehome.io`)
       - traefik.http.routers.heimdall-https.entrypoints=https
       - traefik.http.routers.heimdall-https.rule=Host(`heimdall.int.whitehome.io`)
       - traefik.http.routers.heimdall-https.tls=true
-      - traefik.docker.network=traefik-public
+      - traefik.http.routers.heimdall-http.middlewares=heimdall-https@docker
+      - traefik.http.middlewares.heimdall-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.heimdall-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
