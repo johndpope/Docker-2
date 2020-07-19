@@ -27,7 +27,7 @@ services:
 #          - node.labels.traefik-public.traefik-public-certificates == true
     environment:
       - CF_API_EMAIL=thehunterewhite@gmail.com
-      - CF_API_KEY=50ec1fbb9e5c03448d6b2805fe45182df26a8
+      - CF_API_KEY=
     labels:
       - "traefik.enable=true"
       - "traefik.constraint-label=traefik-public"
