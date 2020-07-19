@@ -5,7 +5,6 @@ services:
     image: traefik:v2.2
     networks:
       - traefik-public
-      - traefik-internal
     ports:
       - target: 80
         published: 80
@@ -35,23 +34,23 @@ services:
       - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
       - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    # HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.int.whitehome.io`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
-      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
+  #    - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       - "traefik.http.routers.traefik-rtr.tls.domains[0].main=whitehome.io"
       - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.whitehome.io"
+      # Pulls main cert for second domain
 #      - traefik.http.routers.traefik-rtr.tls.domains[1].main=whitehome.io
+      # Pulls wildcard cert for second domain
 #      - traefik.http.routers.traefik-rtr.tls.domains[1].sans=*.whitehome.io
       - "traefik.http.routers.traefik-rtr.service=api@internal"
+    # Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
-<<<<<<< HEAD
-#      - "traefik.http.routers.traefik-public-https.middlewares=admin-auth"
-=======
         # Enable HTTP Basic auth, using the middleware created above
-      - "traefik.http.routers.traefik-public-https.middlewares=admin-auth"
+#      - "traefik.http.routers.traefik-public-https.middlewares=admin-auth"
         # Define the port inside of the Docker service to use
->>>>>>> aa692c703c0f9df8cf7d13a2b87063f106761b27
       - "traefik.http.services.traefik-public.loadbalancer.server.port=8080"
     command:
       - --global.checkNewVersion=true
@@ -62,9 +61,9 @@ services:
       - --entryPoints.traefik.address=:8080
       - --api=true
       - --api.insecure=true
-      - --serversTransport.insecureSkipVerify=true
+#      - --serversTransport.insecureSkipVerify=true
       - --log=true
-      - --log.level=DEBUG # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       - --accessLog=true
       - --accessLog.filePath=/traefik.log
       - --accessLog.bufferingSize=100
@@ -77,7 +76,7 @@ services:
       - --providers.docker.network=traefik-public
       - --providers.docker.swarmMode=false
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory.
-      - --providers.file.watch=true # Only works on top level files in the rules folder
+#      - --providers.file.watch=true # Only works on top level files in the rules folder
       - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
       - --certificatesResolvers.dns-cloudflare.acme.email=thehunterewhite@gmail.com
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
@@ -91,7 +90,33 @@ services:
       - /docker-data/shared:/shared
     restart: unless-stopped
 
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    networks:
+      - traefik-public
+    ports:
+      - 4000:80
+      - 4001:443
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.http.routers.heimdall-http.entrypoints=http
+      - traefik.http.routers.heimdall-http.rule=Host(`heimdall.int.whitehome.io`)
+      - traefik.http.routers.heimdall-https.entrypoints=https
+      - traefik.http.routers.heimdall-https.rule=Host(`heimdall.int.whitehome.io`)
+      - traefik.http.routers.heimdall-https.tls=true
+      - traefik.docker.network=traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /docker-data/heimdall:/config
+    restart: unless-stopped
+
 networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
   traefik-public:
     external: true
-  traefik-internal:
