@@ -53,6 +53,9 @@ services:
       - traefik.http.routers.$REPLACE-https.rule=Host(`$REPLACE.int.whitehome.io`) #https hostname
       - traefik.http.routers.$REPLACE-https.tls=true #Traefik enable TLS SSL
       - traefik.docker.network=traefik-public #Traefik network application uses to communicate
+      - traefik.http.routers.$APPLICATION-http.middlewares=$APPLICATION-https@docker
+      - traefik.http.middlewares.$APPLICATION-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.$APPLICATION-https.redirectScheme.permanent=true
     environments: #Environmental values set for the applications
       - PUID=1000
       - PGID=1000
