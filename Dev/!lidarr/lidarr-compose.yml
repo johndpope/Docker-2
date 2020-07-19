@@ -6,18 +6,20 @@ services:
     container_name: lidarr
     networks:
      - traefik-public
-     - traefik-internal
     ports:
       - 4004:8686
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
       - traefik.http.routers.lidarr-http.entrypoints=http
       - traefik.http.routers.lidarr-http.rule=Host(`lidarr.int.whitehome.io`)
       - traefik.http.routers.lidarr-https.entrypoints=https
       - traefik.http.routers.lidarr-https.rule=Host(`lidarr.int.whitehome.io`)
       - traefik.http.routers.lidarr-https.tls=true
-      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.lidarr-http.middlewares=lidarr-https@docker
+      - traefik.http.middlewares.lidarr-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.lidarr-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
@@ -46,5 +48,3 @@ volumes:
 networks:
   traefik-public:
     external: true
-  traefik-internal:
-    external: false

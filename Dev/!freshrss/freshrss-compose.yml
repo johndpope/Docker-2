@@ -6,18 +6,20 @@ services:
     container_name: freshrss
     networks:
      - traefik-public
-     - traefik-internal
     ports:
      - 4011:80
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
       - traefik.http.routers.freshrss-http.entrypoints=http
       - traefik.http.routers.freshrss-http.rule=Host(`freshrss.int.whitehome.io`)
       - traefik.http.routers.freshrss-https.entrypoints=https
       - traefik.http.routers.freshrss-https.rule=Host(`freshrss.int.whitehome.io`)
       - traefik.http.routers.freshrss-https.tls=true
-      - traefik.docker.network=traefik-public
+      - traefik.http.routers.freshrss-http.middlewares=freshrss-https@docker
+      - traefik.http.middlewares.freshrss-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.freshrss-https.redirectScheme.permanent=truee
     environment:
       - PUID=1000
       - PGID=1000
@@ -29,5 +31,3 @@ services:
 networks:
   traefik-public:
     external: true
-  traefik-internal:
-    external: false

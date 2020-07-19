@@ -6,18 +6,17 @@ services:
     container_name: hydra2
     networks:
      - traefik-public
-     - traefik-internal
     ports:
       - 4012:5076
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
       - traefik.http.routers.hydra2-http.entrypoints=http
       - traefik.http.routers.hydra2-http.rule=Host(`hydra2.int.whitehome.io`)
       - traefik.http.routers.hydra2-https.entrypoints=https
       - traefik.http.routers.hydra2-https.rule=Host(`hydra2.int.whitehome.io`)
       - traefik.http.routers.hydra2-https.tls=true
-      - traefik.docker.network=traefik-internal
     environment:
       - PUID=1000
       - PGID=1000
@@ -38,5 +37,3 @@ volumes:
 networks:
   traefik-public:
     external: true
-  traefik-internal:
-    external: false

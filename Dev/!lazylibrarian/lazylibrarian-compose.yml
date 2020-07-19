@@ -11,12 +11,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
       - traefik.http.routers.lazylibrarian-http.entrypoints=http
       - traefik.http.routers.lazylibrarian-http.rule=Host(`lazylibrarian.int.whitehome.io`)
       - traefik.http.routers.lazylibrarian-https.entrypoints=https
       - traefik.http.routers.lazylibrarian-https.rule=Host(`lazylibrarian.int.whitehome.io`)
       - traefik.http.routers.lazylibrarian-https.tls=true
-      - traefik.docker.network=traefik-public
+      - traefik.http.routers.lazylibrarian-http.middlewares=lazylibrarian-https@docker
+      - traefik.http.middlewares.lazylibrarian-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.lazylibrarian-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
@@ -47,5 +50,3 @@ volumes:
 networks:
   traefik-public:
     external: true
-  traefik-internal:
-    external: false

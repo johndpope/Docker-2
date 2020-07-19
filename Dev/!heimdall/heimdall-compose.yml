@@ -6,7 +6,6 @@ services:
     container_name: heimdall
     networks:
       - traefik-public
-      - traefik-internal
     ports:
       - 4000:80
       - 4001:443
@@ -33,5 +32,3 @@ services:
 networks:
   traefik-public:
     external: true
-  traefik-internal:
-    external: false

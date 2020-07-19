@@ -6,18 +6,20 @@ services:
     container_name: organizr-v2
     networks:
       - traefik-public
-      - traefik-internal
     ports:
       - 4002:80
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
       - traefik.http.routers.organizr-http.entrypoints=http
       - traefik.http.routers.organizr-http.rule=Host(`organizr.int.whitehome.io`)
       - traefik.http.routers.organizr-https.entrypoints=https
       - traefik.http.routers.organizr-https.rule=Host(`organizr.int.whitehome.io`)
       - traefik.http.routers.organizr-https.tls=true
-      - traefik.docker.network=traefik-public
+      - traefik.http.routers.organizr-http.middlewares=organizr-https@docker
+      - traefik.http.middlewares.organizr-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.organizr-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
@@ -30,5 +32,3 @@ services:
 networks:
   traefik-public:
     external: true
-  traefik-internal:
-    external: false
