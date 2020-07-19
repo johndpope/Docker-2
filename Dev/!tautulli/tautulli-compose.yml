@@ -12,12 +12,11 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.http.routers.lidarr-http.entrypoints=http
-      - traefik.http.routers.lidarr-http.rule=Host(`lidarr.int.whitehome.io`)
-      - traefik.http.routers.lidarr-https.entrypoints=https
-      - traefik.http.routers.lidarr-https.rule=Host(`lidarr.int.whitehome.io`)
-      - traefik.http.routers.lidarr-https.tls=true
-      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.tautulli-http.entrypoints=http
+      - traefik.http.routers.tautulli-http.rule=Host(`tautulli.int.whitehome.io`)
+      - traefik.http.routers.tautulli-https.entrypoints=https
+      - traefik.http.routers.tautulli-https.rule=Host(`tautulli.int.whitehome.io`)
+      - traefik.http.routers.tautulli-https.tls=true
     environment:
       - PUID=1000
       - PGID=1000

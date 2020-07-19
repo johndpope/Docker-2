@@ -39,7 +39,7 @@ services:
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.int.whitehome.io`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
-#      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
+      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       - "traefik.http.routers.traefik-rtr.tls.domains[0].main=whitehome.io"
       - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.whitehome.io"
       # Pulls main cert for second domain
@@ -50,7 +50,7 @@ services:
     # Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
         # Enable HTTP Basic auth, using the middleware created above
-#      - "traefik.http.routers.traefik-public-https.middlewares=admin-auth"
+      - "traefik.http.routers.traefik-public-https.middlewares=admin-auth"
         # Define the port inside of the Docker service to use
       - "traefik.http.services.traefik-public.loadbalancer.server.port=8080"
     command:
@@ -64,7 +64,7 @@ services:
       - --api.insecure=true
 #      - --serversTransport.insecureSkipVerify=true
       - --log=true
-      - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.level=DEBUG # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       - --accessLog=true
       - --accessLog.filePath=/traefik.log
       - --accessLog.bufferingSize=100
@@ -77,7 +77,7 @@ services:
       - --providers.docker.network=traefik-public
       - --providers.docker.swarmMode=false
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory.
-#      - --providers.file.watch=true # Only works on top level files in the rules folder
+      - --providers.file.watch=true # Only works on top level files in the rules folder
       - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
       - --certificatesResolvers.dns-cloudflare.acme.email=thehunterewhite@gmail.com
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
