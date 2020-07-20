@@ -4,19 +4,24 @@ services:
   calibre-web:
     image: linuxserver/calibre-web
     networks:
-      - traefik-public
-      - traefik-internal
+      - traefik-net
     ports:
       - 4014:8083
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-net
+      #internal routing labels
       - traefik.http.routers.calibre-http.entrypoints=http
       - traefik.http.routers.calibre-http.rule=Host(`calibre.int.whitehome.io`)
       - traefik.http.routers.calibre-https.entrypoints=https
       - traefik.http.routers.calibre-https.rule=Host(`calibre.int.whitehome.io`)
       - traefik.http.routers.calibre-https.tls=true
-      - traefik.docker.network=traefik-public
+      #route connects
+      - traefik.http.routers.calibre-http.middlewares=calibre-https@docker
+      #middeware labels
+      - traefik.http.middlewares.calibre-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.calibre-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
@@ -24,11 +29,11 @@ services:
       - DOCKER_MODS=linuxserver/calibre-web:calibre
     volumes:
       - /docker-data/calibre:/config
-      - p/Literature/eBooks:/books
+      - nova-media/Literature/eBooks:/books
     restart: unless-stopped
 
 volumes:
-  collector-media:
+  nova-media:
     driver: local
     driver_opts:
       type: none
@@ -36,7 +41,5 @@ volumes:
       o: bind
 
 networks:
-  traefik-public:
+  traefik-net:
     external: true
-  traefik-internal:
-    external: false

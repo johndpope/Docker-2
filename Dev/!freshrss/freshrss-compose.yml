@@ -11,15 +11,27 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-public
+      - traefik.docker.network=traefik-net
+      #internal routing labels
       - traefik.http.routers.freshrss-http.entrypoints=http
       - traefik.http.routers.freshrss-http.rule=Host(`freshrss.int.whitehome.io`)
       - traefik.http.routers.freshrss-https.entrypoints=https
       - traefik.http.routers.freshrss-https.rule=Host(`freshrss.int.whitehome.io`)
       - traefik.http.routers.freshrss-https.tls=true
+      #external routing labels
+      - traefik.http.routers.freshrss-public-http.entrypoints=http
+      - traefik.http.routers.freshrss-public-http.rule=Host(`rss.whitehome.io`)
+      - traefik.http.routers.freshrss-public-https.entrypoints=https
+      - traefik.http.routers.freshrss-public-https.rule=Host(`rss.whitehome.io`)
+      - traefik.http.routers.freshrss-public-https.tls=true
+      #route connects
       - traefik.http.routers.freshrss-http.middlewares=freshrss-https@docker
+      - traefik.http.routers.freshrss-public-http.middlewares=freshrss-https@docker
+      #middeware labels
       - traefik.http.middlewares.freshrss-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.freshrss-https.redirectScheme.permanent=truee
+      - traefik.http.middlewares.freshrss-https.redirectScheme.permanent=true
+      - traefik.http.middlewares.freshrss-public-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.freshrss-public-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000

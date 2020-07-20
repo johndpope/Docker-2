@@ -5,27 +5,31 @@ services:
     image: organizrtools/organizr-v2
     container_name: organizr-v2
     networks:
-      - traefik-public
+      - traefik-net
     ports:
       - 4002:80
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-public
+      - traefik.docker.network=traefik-net
+      #internal routing labels
       - traefik.http.routers.organizr-http.entrypoints=http
       - traefik.http.routers.organizr-http.rule=Host(`organizr.int.whitehome.io`)
       - traefik.http.routers.organizr-https.entrypoints=https
       - traefik.http.routers.organizr-https.rule=Host(`organizr.int.whitehome.io`)
       - traefik.http.routers.organizr-https.tls=true
+      #external routing labels
       - traefik.http.routers.organizr-public-http.entrypoints=http
       - traefik.http.routers.organizr-public-http.rule=Host(`dashboard.whitehome.io`)
       - traefik.http.routers.organizr-public-https.entrypoints=https
       - traefik.http.routers.organizr-public-https.rule=Host(`dashboard.whitehome.io`)
       - traefik.http.routers.organizr-public-https.tls=true
+      #route connects
       - traefik.http.routers.organizr-http.middlewares=organizr-https@docker
+      - traefik.http.routers.organizr-public-http.middlewares=organizr-https@docker
+      #middeware labels
       - traefik.http.middlewares.organizr-https.redirectscheme.scheme=https
       - traefik.http.middlewares.organizr-https.redirectScheme.permanent=true
-      - traefik.http.routers.organizr-public-http.middlewares=organizr-https@docker
       - traefik.http.middlewares.organizr-public-https.redirectscheme.scheme=https
       - traefik.http.middlewares.organizr-public-https.redirectScheme.permanent=true
     environment:
@@ -37,5 +41,5 @@ services:
     restart: unless-stopped
 
 networks:
-  traefik-public:
+  traefik-net:
     external: true
