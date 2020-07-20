@@ -1,0 +1,43 @@
+---
+version: "3.7"
+services:
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    networks:
+      - traefik-public
+    ports:
+      - 4005:8989
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - UMASK_SET=022 #optional
+    volumes:
+      - /docker-data/sonarr:/config
+      - collector-media:/media
+      - collector-downloads:/downloads
+    restart: unless-stopped
+
+
+volumes:
+  collector-downloads:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/content-gateway/inbox
+      o: bind
+
+  collector-media:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/media/
+      o: bind
+
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-public:
+    external: true
