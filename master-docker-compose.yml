@@ -100,7 +100,9 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      - "traefik.enable=true"
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-proxy
       ## HTTP Routers
       - "traefik.http.routers.portainer-rtr.entrypoints=https"
       - "traefik.http.routers.portainer-rtr.rule=HostHeader(`portainer.$SECONDDOMAINNAME`)"
@@ -162,15 +164,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.heimdall-rtr.entrypoints=https"
-      - "traefik.http.routers.heimdall-rtr.rule=HostHeader(`heimdall.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.heimdall-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
-      - "traefik.http.services.heimdall-svc.loadbalancer.server.port=$HEIMDALL_PORT_01"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.heimdall-http.entrypoints=http
+      - traefik.http.routers.heimdall-http.rule=Host(`heimdall.$SECONDDOMAINNAME`)
+      - traefik.http.routers.heimdall-https.entrypoints=https
+      - traefik.http.routers.heimdall-https.rule=Host(`heimdall.$SECONDDOMAINNAME`)
+      - traefik.http.routers.heimdall-https.tls=true
+      - traefik.http.routers.heimdall-http.middlewares=heimdall-https@docker
+      - traefik.http.middlewares.heimdall-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.heimdall-https.redirectScheme.permanent=true
     environment:
       - PUID=$PUID
       - PGID=$PGID
