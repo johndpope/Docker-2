@@ -20,7 +20,7 @@ services:
       ## HTTP Services
       - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
       - "traefik.http.services.hydra2-svc.loadbalancer.server.port=$HYDRA2_PORT"
-    environments:
+    environment:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
