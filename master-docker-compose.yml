@@ -41,7 +41,7 @@ services:
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$SECONDDOMAINNAME`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
-      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
+      #- "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       - "traefik.http.routers.traefik-rtr.tls.domains[0].$DOMAINNAME"
       - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.$DOMAINNAME"
       - "traefik.http.routers.traefik-rtr.tls.domains[1].main=$SECONDDOMAINNAME"
@@ -129,19 +129,17 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      - "traefik.enable=true"
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-proxy
       ## HTTP Routers
       - "traefik.http.routers.organizr-rtr.entrypoints=https"
-      - "traefik.http.routers.organizr-rtr.rule=HostHeader(`$DOMAINNAME`,`www.SDOMAINNAME`)"
+      - "traefik.http.routers.organizr-rtr.rule=HostHeader(`organizr.$SECONDDOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.organizr-rtr.middlewares=chain-basic-auth@file"
-        # Redirect non-www to www middleware
-      - "traefik.http.middlewares.organizr-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
-      - "traefik.http.middlewares.organizr-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
-      - "traefik.http.middlewares.organizr-redirect.redirectregex.permanent=true"
       ## HTTP Services
       - "traefik.http.routers.organizr-rtr.service=organizr-svc"
-      - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
+      - "traefik.http.services.organizr-svc.loadbalancer.server.port=5800"
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -287,7 +285,6 @@ services:
   # Radarr - Movie management
   # Set url_base in radarr settings if using PathPrefix
   radarr:
-  radarr:
     image: linuxserver/radarr
     container_name: radarr
     networks:
@@ -421,7 +418,7 @@ services:
       DOCKER_MODS: linuxserver/calibre-web:calibre
     volumes:
       - $DOCKERDIR/calibre:/config
-      - nova-media/Literature/eBooks:/books
+      - nova-media-ebooks:/books
     restart: unless-stopped
 
   # Ombi - Media Requests
@@ -567,11 +564,17 @@ volumes:
       type: none
       device: /smb/media/
       o: bind
-  nova-downloads:
+  nova-media-ebooks:
     driver: local
     driver_opts:
       type: none
-      device: /smb/content-gateway/inbox
+      device: /smb/media/Literature/eBooks
+      o: bind
+  nova-nzb:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/content-gateway/local inbox/nzbget/completed
       o: bind
 
 secrets:
