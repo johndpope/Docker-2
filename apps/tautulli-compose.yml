@@ -1,0 +1,34 @@
+---
+version: "3.7"
+services:
+  tautulli:
+    image: linuxserver/tautulli
+    container_name: tautulli
+    networks:
+     - traefik-proxy
+    ports:
+      - $TAUTULLI_PORT:8181
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-proxy
+      ## HTTP Routers
+      - "traefik.http.routers.tautulli-rtr.entrypoints=https"
+      - "traefik.http.routers.tautulli-rtr.rule=HostHeader(`tautulli.$SECONDDOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.tautulli-rtr.middlewares=chain-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
+      - "traefik.http.services.tautulli-svc.loadbalancer.server.port=$TAUTULLI_PORT"
+    environments:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    volumes:
+      - $DOCKERDIR/tautulli:/config
+      - $DOCKERDIR/tautulli/logs:/logs
+    restart: unless-stopped
+
+networks:
+  traefik-proxy:
+    external: true

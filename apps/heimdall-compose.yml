@@ -1,0 +1,36 @@
+---
+version: "3.7"
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    networks:
+      - traefik-proxy
+    ports:
+      - $HEIMDALL_PORT_01:80
+      - $HEIMDALL_PORT_02:443
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-proxy
+      ## HTTP Routers
+      - "traefik.http.routers.heimdall-rtr.entrypoints=https"
+      - "traefik.http.routers.heimdall-rtr.rule=HostHeader(`heimdall.$SECONDDOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.heimdall-rtr.middlewares=chain-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
+      - "traefik.http.services.heimdall-svc.loadbalancer.server.port=$HEIMDALL_PORT_01"
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/heimdall:/config
+    restart: unless-stopped
+
+networks:
+  traefik-proxy:
+    external: true

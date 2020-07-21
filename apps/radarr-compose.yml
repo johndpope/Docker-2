@@ -1,0 +1,57 @@
+---
+version: "3.7"
+services:
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    networks:
+     - traefik-proxy
+    ports:
+      - $RADARR_PORT:7878
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-proxy
+      ## HTTP Routers
+      - "traefik.http.routers.radarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr-bypass.rule=Headers(`X-Api-Key`, `$RADARR_API_KEY`) || Query(`apikey`, `$RADARR_API_KEY`)"
+      - "traefik.http.routers.radarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.radarr-rtr.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr.rule=HostHeader(`radarr.$SECONDDOMAINNAME`)"
+      - "traefik.http.routers.radarr-rtr.priority=99"
+      ## Middlewares
+      - "traefik.http.routers.radarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.radarr-rtr.middlewares=chain-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.radarr-rtr.service=radarr-svc"
+      - "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
+      - "traefik.http.services.radarr-svc.loadbalancer.server.port=$RADARR_PORT"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - UMASK_SET=022 #optional
+    volumes:
+      - /docker-data/radarr:/config
+      - nova-media:/media
+      - nova-downloads:/downloads
+    restart: unless-stopped
+
+volumes:
+  nova-downloads:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/content-gateway/
+      o: bind
+  nova-media:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/media/
+      o: bind
+
+networks:
+  traefik-proxy:
+    external: true

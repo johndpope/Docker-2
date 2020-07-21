@@ -1,0 +1,36 @@
+---
+version: "3.7"
+services:
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    networks:
+     - traefik-proxy
+    ports:
+      - "$JACKETT_PORT:9117"
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jackett-rtr.entrypoints=https"
+      - "traefik.http.routers.jackett-rtr.rule=HostHeader(`jackett.$SECONDDOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.jackett-rtr.middlewares=chain-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.jackett-rtr.service=jackett-svc"
+      - "traefik.http.services.jackett-svc.loadbalancer.server.port=$JACKETT_PORT"
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    volumes:
+      - $DOCKERDIR/jackett:/config
+      - $DOCKERDIR/jackett/blackhole:/downloads
+      - "/etc/localtime:/etc/localtime:ro"
+    restart: unless-stopped
+
+
+networks:
+  traefik-proxy:
+    external: true

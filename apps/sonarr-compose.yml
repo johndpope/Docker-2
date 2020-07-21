@@ -1,0 +1,56 @@
+---
+version: "3.7"
+services:
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    networks:
+     - traefik-proxy
+    ports:
+      - $SONARR_PORT:8989
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-proxy
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.sonarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.sonarr-rtr-bypass.rule=Headers(`X-Api-Key`, `$SONARR_API_KEY`) || Query(`apikey`, `$SONARR_API_KEY`)"
+      - "traefik.http.routers.sonarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.sonarr-rtr.entrypoints=https"
+      - "traefik.http.routers.sonarr-rtr.rule=HostHeader(`sonarr.$SECONDDOMAINNAME`)"
+      - "traefik.http.routers.sonarr-rtr.priority=99"
+      ## Middlewares
+      - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.sonarr-rtr.middlewares=chain-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
+      - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
+      - "traefik.http.services.sonarr-svc.loadbalancer.server.port=$SONARR_PORT"
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    volumes:
+      - $DOCKERDIR/sonarr:/config
+      - nova-media:/media
+      - nova-downloads:/downloads
+    restart: unless-stopped
+
+volumes:
+  nova-downloads:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/content-gateway/
+      o: bind
+  nova-media:
+    driver: local
+    driver_opts:
+      type: none
+      device: /smb/media/
+      o: bind
+
+networks:
+  traefik-proxy:
+    external: true
