@@ -20,7 +20,7 @@ services:
       ## HTTP Services
       - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=$TAUTULLI_PORT"
-    environments:
+    environment:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
