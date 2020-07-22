@@ -133,15 +133,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.organizr-rtr.entrypoints=https"
-      - "traefik.http.routers.organizr-rtr.rule=HostHeader(`organizr.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.organizr-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.organizr-rtr.service=organizr-svc"
-      - "traefik.http.services.organizr-svc.loadbalancer.server.port=5800"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.organizr-http.entrypoints=http
+      - traefik.http.routers.organizr-http.rule=Host(`organizr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.organizr-https.entrypoints=https
+      - traefik.http.routers.organizr-https.rule=Host(`organizr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.organizr-https.tls=true
+      - traefik.http.routers.organizr-http.middlewares=organizr-https@docker
+      - traefik.http.middlewares.organizr-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.organizr-https.redirectScheme.permanent=true
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -195,15 +195,17 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.jackett-rtr.entrypoints=https"
-      - "traefik.http.routers.jackett-rtr.rule=HostHeader(`jackett.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.jackett-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.jackett-rtr.service=jackett-svc"
-      - "traefik.http.services.jackett-svc.loadbalancer.server.port=$JACKETT_PORT"
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.jackett-http.entrypoints=http
+      - traefik.http.routers.jackett-http.rule=Host(`jackett.$SECONDDOMAINNAME`)
+      - traefik.http.routers.jackett-https.entrypoints=https
+      - traefik.http.routers.jackett-https.rule=Host(`jackett.$SECONDDOMAINNAME`)
+      - traefik.http.routers.jackett-https.tls=true
+      - traefik.http.routers.jackett-http.middlewares=jackett-https@docker
+      - traefik.http.middlewares.jackett-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.jackett-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -225,15 +227,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.hydra2-rtr.entrypoints=https"
-      - "traefik.http.routers.hydra2-rtr.rule=HostHeader(`hydra2.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.hydra2-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
-      - "traefik.http.services.hydra2-svc.loadbalancer.server.port=$HYDRA2_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.hydra2-http.entrypoints=http
+      - traefik.http.routers.hydra2-http.rule=Host(`hydra2.$SECONDDOMAINNAME`)
+      - traefik.http.routers.hydra2-https.entrypoints=https
+      - traefik.http.routers.hydra2-https.rule=Host(`hydra2.$SECONDDOMAINNAME`)
+      - traefik.http.routers.hydra2-https.tls=true
+      - traefik.http.routers.hydra2-http.middlewares=hydra2-https@docker
+      - traefik.http.middlewares.hydra2-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.hydra2-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -257,22 +259,17 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth Bypass
-      - "traefik.http.routers.lidarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.lidarr-rtr-bypass.rule=Headers(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`)"
-      - "traefik.http.routers.lidarr-rtr-bypass.priority=100"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.lidarr-rtr.entrypoints=https"
-      - "traefik.http.routers.lidarr-rtr.rule=HostHeader(`lidarr.$SECONDDOMAINNAME`)"
-      - "traefik.http.routers.lidarr-rtr.priority=99"
-      ## Middlewares
-      - "traefik.http.routers.lidarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.lidarr-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
-      - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
-      - "traefik.http.services.lidarr-svc.loadbalancer.server.port=$LIDARR_PORT"
+      - traefik.enable=true
+      - traefik.constraint-label=traefik-public
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.lidarr-http.entrypoints=http
+      - traefik.http.routers.lidarr-http.rule=Host(`lidarr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.lidarr-https.entrypoints=https
+      - traefik.http.routers.lidarr-https.rule=Host(`lidarr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.lidarr-https.tls=true
+      - traefik.http.routers.lidarr-http.middlewares=lidarr-https@docker
+      - traefik.http.middlewares.lidarr-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.lidarr-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -296,22 +293,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.radarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.radarr-rtr-bypass.rule=Headers(`X-Api-Key`, `$RADARR_API_KEY`) || Query(`apikey`, `$RADARR_API_KEY`)"
-      - "traefik.http.routers.radarr-rtr-bypass.priority=100"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.radarr-rtr.entrypoints=https"
-      - "traefik.http.routers.radarr-rtr.rule=HostHeader(`radarr.$SECONDDOMAINNAME`)"
-      - "traefik.http.routers.radarr-rtr.priority=99"
-      ## Middlewares
-      - "traefik.http.routers.radarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.radarr-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.radarr-rtr.service=radarr-svc"
-      - "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
-      - "traefik.http.services.radarr-svc.loadbalancer.server.port=$RADARR_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.radarr-http.entrypoints=http
+      - traefik.http.routers.radarr-http.rule=Host(`radarr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.radarr-https.entrypoints=https
+      - traefik.http.routers.radarr-https.rule=Host(`radarr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.radarr-https.tls=true
+      - traefik.http.routers.radarr-http.middlewares=radarr-https@docker
+      - traefik.http.middlewares.radarr-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.radarr-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
@@ -335,22 +325,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers Auth Bypass
-      - "traefik.http.routers.sonarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.sonarr-rtr-bypass.rule=Headers(`X-Api-Key`, `$SONARR_API_KEY`) || Query(`apikey`, `$SONARR_API_KEY`)"
-      - "traefik.http.routers.sonarr-rtr-bypass.priority=100"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.sonarr-rtr.entrypoints=https"
-      - "traefik.http.routers.sonarr-rtr.rule=HostHeader(`sonarr.$SECONDDOMAINNAME`)"
-      - "traefik.http.routers.sonarr-rtr.priority=99"
-      ## Middlewares
-      - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.sonarr-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
-      - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
-      - "traefik.http.services.sonarr-svc.loadbalancer.server.port=$SONARR_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.sonarr-http.entrypoints=http
+      - traefik.http.routers.sonarr-http.rule=Host(`sonarr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.sonarr-https.entrypoints=https
+      - traefik.http.routers.sonarr-https.rule=Host(`sonarr.$SECONDDOMAINNAME`)
+      - traefik.http.routers.sonarr-https.tls=true
+      - traefik.http.routers.sonarr-http.middlewares=sonarr-https@docker
+      - traefik.http.middlewares.sonarr-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.sonarr-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -372,15 +355,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.lazylibrarian-rtr.entrypoints=https"
-      - "traefik.http.routers.lazylibrarian-rtr.rule=HostHeader(`lazylibrarian.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.lazylibrarian-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.lazylibrarian-rtr.service=lazylibrarian-svc"
-      - "traefik.http.services.lazylibrarian-svc.loadbalancer.server.port=$LAZYLIBRARIAN_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.lazylibrarian-http.entrypoints=http
+      - traefik.http.routers.lazylibrarian-http.rule=Host(`lazylibrarian.$SECONDDOMAINNAME`)
+      - traefik.http.routers.lazylibrarian-https.entrypoints=https
+      - traefik.http.routers.lazylibrarian-https.rule=Host(`lazylibrarian.$SECONDDOMAINNAME`)
+      - traefik.http.routers.lazylibrarian-https.tls=true
+      - traefik.http.routers.lazylibrarian-http.middlewares=lazylibrarian-https@docker
+      - traefik.http.middlewares.lazylibrarian-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.lazylibrarian-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
@@ -404,15 +387,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.calibre-rtr.entrypoints=https"
-      - "traefik.http.routers.calibre-rtr.rule=HostHeader(`calibre.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.calibre-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.calibre-rtr.service=calibre-svc"
-      - "traefik.http.services.calibre-svc.loadbalancer.server.port=$CALIBRE_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.calibreweb-http.entrypoints=http
+      - traefik.http.routers.calibreweb-http.rule=Host(`calibreweb.$SECONDDOMAINNAME`)
+      - traefik.http.routers.calibreweb-https.entrypoints=https
+      - traefik.http.routers.calibreweb-https.rule=Host(`calibreweb.$SECONDDOMAINNAME`)
+      - traefik.http.routers.calibreweb-https.tls=true
+      - traefik.http.routers.calibreweb-http.middlewares=calibreweb-https@docker
+      - traefik.http.middlewares.calibreweb-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.calibreweb-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -434,15 +417,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.ombi-rtr.entrypoints=https"
-      - "traefik.http.routers.ombi-rtr.rule=HostHeader(`ombi.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.ombi-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.ombi-rtr.service=ombi-svc"
-      - "traefik.http.services.ombi-svc.loadbalancer.server.port=$OMBI_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.ombi-http.entrypoints=http
+      - traefik.http.routers.ombi-http.rule=Host(`ombi.$SECONDDOMAINNAME`)
+      - traefik.http.routers.ombi-https.entrypoints=https
+      - traefik.http.routers.ombi-https.rule=Host(`ombi.$SECONDDOMAINNAME`)
+      - traefik.http.routers.ombi-https.tls=true
+      - traefik.http.routers.ombi-http.middlewares=ombi-https@docker
+      - traefik.http.middlewares.ombi-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.ombi-https.redirectScheme.permanent=true
     environment:
       - PUID=1000
       - PGID=1000
@@ -464,15 +447,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.tautulli-rtr.entrypoints=https"
-      - "traefik.http.routers.tautulli-rtr.rule=HostHeader(`tautulli.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.tautulli-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
-      - "traefik.http.services.tautulli-svc.loadbalancer.server.port=$TAUTULLI_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.tautulli-http.entrypoints=http
+      - traefik.http.routers.tautulli-http.rule=Host(`tautulli.$SECONDDOMAINNAME`)
+      - traefik.http.routers.tautulli-https.entrypoints=https
+      - traefik.http.routers.tautulli-https.rule=Host(`tautulli.$SECONDDOMAINNAME`)
+      - traefik.http.routers.tautulli-https.tls=true
+      - traefik.http.routers.tautulli-http.middlewares=tautulli-https@docker
+      - traefik.http.middlewares.tautulli-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.tautulli-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -494,15 +477,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.wikijs-rtr.entrypoints=https"
-      - "traefik.http.routers.wikijs-rtr.rule=HostHeader(`wikijs.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.wikijs-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.wikijs-rtr.service=wikijs-svc"
-      - "traefik.http.services.wikijs-svc.loadbalancer.server.port=$WIKIJS_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.wikijs-http.entrypoints=http
+      - traefik.http.routers.wikijs-http.rule=Host(`wikijs.$SECONDDOMAINNAME`)
+      - traefik.http.routers.wikijs-https.entrypoints=https
+      - traefik.http.routers.wikijs-https.rule=Host(`wikijs.$SECONDDOMAINNAME`)
+      - traefik.http.routers.wikijs-https.tls=true
+      - traefik.http.routers.wikijs-http.middlewares=wikijs-https@docker
+      - traefik.http.middlewares.wikijs-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.wikijs-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -522,15 +505,15 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.freshrss-rtr.entrypoints=https"
-      - "traefik.http.routers.freshrss-rtr.rule=HostHeader(`freshrss.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.freshrss-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
-      - "traefik.http.services.freshrss-svc.loadbalancer.server.port=$FRESHRSS_PORT"
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.freshrss-http.entrypoints=http
+      - traefik.http.routers.freshrss-http.rule=Host(`freshrss.$SECONDDOMAINNAME`)
+      - traefik.http.routers.freshrss-https.entrypoints=https
+      - traefik.http.routers.freshrss-https.rule=Host(`freshrss.$SECONDDOMAINNAME`)
+      - traefik.http.routers.freshrss-https.tls=true
+      - traefik.http.routers.freshrss-http.middlewares=freshrss-https@docker
+      - traefik.http.middlewares.freshrss-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.freshrss-https.redirectScheme.permanent=true
     environment:
       PUID: $PUID
       PGID: $PGID
