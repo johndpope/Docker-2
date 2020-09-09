@@ -1,0 +1,16 @@
+#cloud-config
+runcmd:
+  -  sudo mkfs.ext4 -L RANCHER_STATE /dev/sda
+hostname : sf-001-rancher
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDOkp4fmQLJV3Yp2qaicKYu3b4UR1x8hDoZ9XLRoIZ/m5BJFgD5/gtAoHDLFVKBbGFHooMH8qaecwCAknz8DpxK0qVVsn1YmdqPvv7CKYC+9MIpK8VDHwlVHslNhbqq+v0zH8j55zqpihC3UZIX/KVlM322ywHTIw/FYudQ86+vRkv+AIB9saUCwWl2nvJW018GDAjzV9iVDDmj6Bv/y4aw/WNOVr/AsV5h6b1bPl5aAiNvrtcIaglP5xrNuw76sqgg+dWE65m8vHd4TlIAIMUqiM0HvIZzvImOuu5sF9/q9dMLyKrt0bMvSrpF+NvQRIkucsLOElccrDbiyc4ozTkNC5yEtd42hn/zeKiFHarg2g+Ofgxbo+XiShm7zW14R0y9K0kfnVyzoL0v9hN5EWjX1WApu79Tl57mhQ/6ohM8wap8B5Zb9klKaYgAw9ERKsT9ah0q3TR83eicFrbcB0Xdz/m5cz6UkYx/5nPnfuKiuePqnrUAQCV1F8eo7caaxWe3GS6LRTNLtk/l57ku6qCI+GmGBBBbtgSSee+yY8Xzmx6ZLWtpEKdGj8EuTuXvvIgUmHbnab8e+dMUWgkHQ0SBG6+GzDOHX16gjCu9rqAZElSTDGP2n0VL6NyyVWXiW3EcbboHjre6LZvSoFAkcZ8hw+XqtFbHRKoP7P4IaX/mXw== thehunterewhite@gmail.com
+rancher:
+  network:
+    interfaces:
+      eth*:
+        address: 10.229.40.60/24
+        gateway: 10.229.40.1
+    dns:
+      nameservers:
+        - 10.124.40.20
+        - 10.229.40.1
