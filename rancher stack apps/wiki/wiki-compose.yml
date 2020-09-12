@@ -1,0 +1,31 @@
+---
+### Rancher Compose file for freshrss ###
+version: "2"
+services:
+  wikijs:
+    image: linuxserver/wikijs
+    container_name: wikijs
+    ports:
+      - 4010:3000
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/wikijs:/config
+      - /home/wikijs/data:/data
+    restart: unless-stopped
+
+  dokuwiki:
+    image: linuxserver/dokuwiki
+    container_name: dokuwiki
+    ports:
+      - 4020:80
+      - 4021:443
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/dokuwiki/config:/config
+    restart: unless-stopped

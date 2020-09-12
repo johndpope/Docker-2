@@ -1,0 +1,31 @@
+---
+### Rancher Compose file for indexer services ###
+version: "2"
+services:
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    ports:
+      - 4007:9117
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/jackett:/config
+    restart: unless-stopped
+
+  hydra2:
+    image: linuxserver/hydra2
+    container_name: hydra2
+    ports:
+      - 4008:5076
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/hydra2:/config
+    restart: unless-stopped
