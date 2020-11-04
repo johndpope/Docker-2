@@ -5,12 +5,12 @@ services:
     image: linuxserver/wikijs
     container_name: wikijs
     ports:
-      - $WIKIJS_PORT:3000
+      - 4000:3000
     environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
+      PUID: 1000
+      PGID: 1000
+      TZ: America/New_York
     volumes:
-      - $DOCKERDIR/wikijs:/config
-      - $DOCKERDIR/wikijs/data:/data
+      - /home/docker-data/wikijs/config:/config
+      - /home/docker-data/wikijs/data:/data
     restart: unless-stopped
