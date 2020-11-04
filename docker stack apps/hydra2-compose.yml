@@ -4,22 +4,8 @@ services:
   hydra2:
     image: linuxserver/hydra2
     container_name: hydra2
-    networks:
-     - traefik-proxy
     ports:
       - $HYDRA2_PORT:5076
-    labels:
-      - traefik.enable=true
-      - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.hydra2-rtr.entrypoints=https"
-      - "traefik.http.routers.hydra2-rtr.rule=HostHeader(`hydra2.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.hydra2-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
-      - "traefik.http.services.hydra2-svc.loadbalancer.server.port=$HYDRA2_PORT"
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -28,15 +14,3 @@ services:
       - $DOCKERDIR/hydra2:/config
       - nova-nzb:/downloads
     restart: unless-stopped
-
-volumes:
-  nova-nzb:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/content-gateway/local inbox/nzbget/completed
-      o: bind
-
-networks:
-  traefik-proxy:
-    external: true

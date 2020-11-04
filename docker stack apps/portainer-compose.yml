@@ -4,23 +4,8 @@ services:
   portainer:
     container_name: portainer
     image: portainer/portainer:latest
-    networks:
-      - traefik-proxy
     ports:
       - "$PORTAINER_PORT:9000"
-    security_opt:
-      - no-new-privileges:true
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.portainer-rtr.entrypoints=https"
-      - "traefik.http.routers.portainer-rtr.rule=HostHeader(`portainer.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      # - "traefik.http.routers.portainer-rtr.middlewares=chain-no-auth@file" # No Authentication
-      - "traefik.http.routers.portainer-rtr.middlewares=chain-basic-auth@file" # Basic Authentication
-      ## HTTP Services
-      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
     environment:
       - TZ=$TZ
     command: -H unix:///var/run/docker.sock
@@ -28,7 +13,3 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKERDIR/portainer/data:/data # Change to local directory if you want to save/transfer config locally
     restart: unless-stopped
-
-networks:
-  traefik-proxy:
-    external: true

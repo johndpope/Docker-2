@@ -4,22 +4,8 @@ services:
   lazylibrarian:
     image: linuxserver/lazylibrarian
     container_name: lazylibrarian
-    networks:
-     - traefik-proxy
     ports:
       - $LAZYLIBRARIAN_PORT:5299
-    labels:
-      - traefik.enable=true
-      - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.lazylibrarian-rtr.entrypoints=https"
-      - "traefik.http.routers.lazylibrarian-rtr.rule=HostHeader(`lazylibrarian.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.lazylibrarian-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.lazylibrarian-rtr.service=lazylibrarian-svc"
-      - "traefik.http.services.lazylibrarian-svc.loadbalancer.server.port=$LAZYLIBRARIAN_PORT"
     environment:
       - PUID=1000
       - PGID=1000
@@ -30,23 +16,3 @@ services:
       - nova-downloads:/downloads
       - nova-media:/books
     restart: unless-stopped
-
-
-volumes:
-  nova-downloads:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/content-gateway/inbox
-      o: bind
-
-  nova-media:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/media/
-      o: bind
-
-networks:
-  traefik-proxy:
-    external: true

@@ -4,22 +4,8 @@ services:
   ombi:
     image: linuxserver/ombi
     container_name: ombi
-    networks:
-      - traefik-proxy
     ports:
       - $OMBI_PORT:3579
-    labels:
-      - traefik.enable=true
-      - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.ombi-rtr.entrypoints=https"
-      - "traefik.http.routers.ombi-rtr.rule=HostHeader(`ombi.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.ombi-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.ombi-rtr.service=ombi-svc"
-      - "traefik.http.services.ombi-svc.loadbalancer.server.port=$OMBI_PORT"
     environment:
       - PUID=1000
       - PGID=1000
@@ -28,7 +14,3 @@ services:
     volumes:
      - $DOCKERDIR/ombi:/config
     restart: unless-stopped
-
-networks:
-  traefik-proxy:
-    external: true

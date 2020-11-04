@@ -3,22 +3,8 @@ version: "3.7"
 services:
   calibre-web:
     image: linuxserver/calibre-web
-    networks:
-      - traefik-proxy
     ports:
       - $CALIBRE_PORT:8083
-    labels:
-      - traefik.enable=true
-      - traefik.constraint-label=traefik-public
-      - traefik.docker.network=traefik-proxy
-      ## HTTP Routers
-      - "traefik.http.routers.calibre-rtr.entrypoints=https"
-      - "traefik.http.routers.calibre-rtr.rule=HostHeader(`calibre.$SECONDDOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.calibre-rtr.middlewares=chain-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.calibre-rtr.service=calibre-svc"
-      - "traefik.http.services.calibre-svc.loadbalancer.server.port=$CALIBRE_PORT"
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -28,15 +14,3 @@ services:
       - $DOCKERDIR/calibre:/config
       - nova-media/Literature/eBooks:/books
     restart: unless-stopped
-
-volumes:
-  nova-media:
-    driver: local
-    driver_opts:
-      type: none
-      device: /smb/media/
-      o: bind
-
-networks:
-  traefik-proxy:
-    external: true
