@@ -1,0 +1,18 @@
+#dev#
+---
+version: "3.7"
+services:
+  organizr:
+    image: organizrtools/organizr-v2
+    container_name: organizr-v2
+    ports:
+      - $ORGANIZR_PORT:80
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/organizr:/config
+    restart: unless-stopped

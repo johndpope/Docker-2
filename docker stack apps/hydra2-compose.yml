@@ -1,0 +1,17 @@
+#dev#
+---
+version: "3.7"
+services:
+  hydra2:
+    image: linuxserver/hydra2
+    container_name: hydra2
+    ports:
+      - $HYDRA2_PORT:5076
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    volumes:
+      - $DOCKERDIR/hydra2:/config
+      - nova-nzb:/downloads
+    restart: unless-stopped

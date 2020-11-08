@@ -1,0 +1,32 @@
+---
+### Rancher Compose file for frontend organization apps ###
+version: "2"
+services:
+  organizr:
+    image: organizrtools/organizr-v2
+    container_name: organizr-v2
+    ports:
+      - 4002:80
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/docker-data/organizr:/config
+    restart: unless-stopped
+
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    ports:
+      - 4000:80
+      - 4001:443
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/docker-data//heimdall:/config
+    restart: unless-stopped

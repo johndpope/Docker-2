@@ -1,0 +1,19 @@
+#dev#
+---
+version: "3.7"
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    ports:
+      - $HEIMDALL_PORT_01:80
+      - $HEIMDALL_PORT_02:443
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/heimdall:/config
+    restart: unless-stopped

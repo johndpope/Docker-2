@@ -1,0 +1,16 @@
+---
+### Rancher Compose file for freshrss ###
+version: "2"
+services:
+  freshrss:
+    image: linuxserver/freshrss
+    container_name: freshrss
+    ports:
+     - 4011:80
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/freshrss:/config
+    restart: unless-stopped

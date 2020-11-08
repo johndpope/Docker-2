@@ -1,0 +1,19 @@
+#dev#
+---
+version: '3.7'
+services:
+  homeassistant:
+    image: homeassistant/home-assistant:stable
+    container_name: home-assistant
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    volumes:
+      - $DOCKERDIR/homeassistant:/config
+    restart: always

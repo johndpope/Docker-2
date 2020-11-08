@@ -1,0 +1,19 @@
+#dev#
+---
+version: '3.7'
+services:
+  lazylibrarian:
+    image: linuxserver/lazylibrarian
+    container_name: lazylibrarian
+    ports:
+      - $LAZYLIBRARIAN_PORT:5299
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - DOCKER_MODS=linuxserver/calibre-web:calibre #optional
+    volumes:
+      - $DOCKERDIR/lazylibrarian:/config
+      - nova-downloads:/downloads
+      - nova-media:/books
+    restart: unless-stopped

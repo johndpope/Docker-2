@@ -1,0 +1,22 @@
+#dev#
+---
+version: "3.7"
+services:
+  mariadb:
+    image: linuxserver/mariadb
+    container_name: mariadb
+    networks:
+     - traefik-proxy
+    ports:
+      - $MARIADB_PORT:3306
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+    volumes:
+      - $DOCKERDIR/mariadb/data:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

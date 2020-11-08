@@ -1,0 +1,42 @@
+---
+### Rancher Compose file for media applications ###
+version: "2"
+services:
+  calibre-web:
+    image: linuxserver/calibre-web
+    ports:
+      - 4016:8083
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/calibre:/config
+    restart: unless-stopped
+
+  ombi:
+    image: linuxserver/ombi
+    container_name: ombi
+    ports:
+      - 4012:3579
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+     - /home/ombi:/config
+    restart: unless-stopped
+
+  tautulli:
+    image: linuxserver/tautulli
+    container_name: tautulli
+    ports:
+      - 4003:8181
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/tautulli:/config
+      - /home/tautulli/logs:/logs
+    restart: unless-stopped
