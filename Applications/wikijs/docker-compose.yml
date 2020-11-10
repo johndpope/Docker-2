@@ -1,0 +1,25 @@
+---
+version: "3.7"
+services:
+  wikijs:
+    image: linuxserver/wikijs
+    container_name: wikijs
+    networks:
+     - int-proxy
+     - int-vpn
+    ports:
+      - 4010:3000
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - /docker/appdata/wikijs:/config
+      - /docker/appdata/wikijs/data:/data
+    restart: unless-stopped
+
+networks:
+  int-proxy:
+    external: false
+  int-vpn:
+    external: false
