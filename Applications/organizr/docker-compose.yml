@@ -1,0 +1,15 @@
+---
+version: "3.7"
+services:
+  organizr:
+    image: organizr/organizr
+    container_name: organizr
+    ports:
+      - 4020:80
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
+    volumes:
+      - /home/docker/appdata/organizr:/config
+    restart: unless-stopped

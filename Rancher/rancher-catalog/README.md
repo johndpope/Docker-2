@@ -1,6 +1,35 @@
-MIT License
+# rancher.catalog
 
-Copyright (c) 2021 Whitehome.io
+
+# Rancher Custom Catalog
+
+This catalog provides templates created by Hunter White.
+
+This is a learning lab so successful production deployment is like 50/50 guaranteed. Most images based on linuxserver docker images.
+
+## Stacks in development
+* Airsonic
+* Caddy
+* Calibre-web
+* DokuWiki
+* FreshRSS
+* Heimdall
+* Hydra2
+* Jackett
+* Lazy Librarian
+* Matrix
+* Ombi
+* Organizr
+* Radarr
+* Tautulli
+* Traefik
+* WikiJS
+* Wireguard
+
+# License
+The MIT License
+
+Copyright (c) 2020 Hunter White
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
