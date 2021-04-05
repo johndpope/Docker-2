@@ -5,14 +5,11 @@ services:
     image: linuxserver/heimdall
     container_name: heimdall
     ports:
-      - $HEIMDALL_PORT_01:80
-      - $HEIMDALL_PORT_02:443
-    security_opt:
-      - no-new-privileges:true
+      - 4021:80
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
     volumes:
-      - $DOCKERDIR/heimdall:/config
+      - /home/docker/appdata/heimdall:/config
     restart: unless-stopped

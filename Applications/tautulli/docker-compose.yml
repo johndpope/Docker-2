@@ -5,12 +5,12 @@ services:
     image: linuxserver/tautulli
     container_name: tautulli
     ports:
-      - $TAUTULLI_PORT:8181
+      - 4011:8181
     environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
     volumes:
-      - $DOCKERDIR/tautulli:/config
-      - $DOCKERDIR/tautulli/logs:/logs
+      - /home/docker/appdata/tautulli:/config
+      - /home/docker/appdata/tautulli/logs:/logs
     restart: unless-stopped

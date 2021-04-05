@@ -2,15 +2,14 @@
 version: '3.7'
 services:
   ombi:
-    image: linuxserver/ombi
+    image: ghcr.io/linuxserver/ombi
     container_name: ombi
     ports:
-      - $OMBI_PORT:3579
+      - 4012:3579
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
-      - BASE_URL=/ombi #optional
     volumes:
-     - $DOCKERDIR/ombi:/config
+      - /home/docker/appdata/ombi/config:/config
     restart: unless-stopped

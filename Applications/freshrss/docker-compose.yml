@@ -5,11 +5,11 @@ services:
     image: linuxserver/freshrss
     container_name: freshrss
     ports:
-     - $FRESHRSS_PORT:80
+     - 4000:80
     environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
     volumes:
-      - $DOCKERDIR/freshrss:/config
+      - /home/docker/appdata/freshrss:/config    
     restart: unless-stopped

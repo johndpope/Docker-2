@@ -5,13 +5,11 @@ services:
     image: linuxserver/jackett
     container_name: jackett
     ports:
-      - "$JACKETT_PORT:9117"
+      - 4014:9117
     environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
+      - PUID=1000
+      - PGID=1000
+      - TZ="America/New_York"
     volumes:
-      - $DOCKERDIR/jackett:/config
-      - $DOCKERDIR/jackett/blackhole:/downloads
-      - "/etc/localtime:/etc/localtime:ro"
+      - /home/docker/appdata/jackett:/config
     restart: unless-stopped
