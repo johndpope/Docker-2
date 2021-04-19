@@ -11,5 +11,5 @@ services:
       - PGID=1000
       - TZ="America/New_York"
     volumes:
-      - /home/docker/appdata/freshrss:/config
+      - /docker/appdata/freshrss:/config
     restart: unless-stopped
