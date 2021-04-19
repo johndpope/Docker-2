@@ -11,5 +11,5 @@ services:
       - PGID=1000
       - TZ="America/New_York"
     volumes:
-      - /home/docker/appdata/hydra2:/config
+      - /docker/appdata/hydra2:/config
     restart: unless-stopped

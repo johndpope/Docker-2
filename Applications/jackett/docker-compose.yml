@@ -11,5 +11,5 @@ services:
       - PGID=1000
       - TZ="America/New_York"
     volumes:
-      - /home/docker/appdata/jackett:/config
+      - /docker/appdata/jackett:/config
     restart: unless-stopped

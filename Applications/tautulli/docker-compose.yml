@@ -11,6 +11,6 @@ services:
       - PGID=1000
       - TZ="America/New_York"
     volumes:
-      - /home/docker/appdata/tautulli:/config
-      - /home/docker/appdata/tautulli/logs:/logs
+      - /docker/appdata/tautulli:/config
+      - /docker/appdata/tautulli/logs:/logs
     restart: unless-stopped
