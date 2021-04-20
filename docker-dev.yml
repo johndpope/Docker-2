@@ -9,6 +9,7 @@ networks:
   default:
     driver: bridge
 
+services:
 # Traefik 2 - Reverse Proxy
   traefik:
     container_name: traefik
