@@ -11,6 +11,6 @@ services:
       - PGID=1000
       - TZ="America/New_York"
     volumes:
-      - /home/docker/appdata/wikijs:/config
-      - /home/docker/appdata/wikijs/data:/data
+      - /docker/appdata/wikijs:/config
+      - /docker/appdata/wikijs/data:/data
     restart: unless-stopped

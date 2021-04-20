@@ -2,7 +2,7 @@
 version: "3.3"
 services:
   portainer:
-    image: portainer/portainer
+    image: portainer/portainer-ce
     container_name: portainer
     command: -H unix:///var/run/docker.sock
     ports:
@@ -10,5 +10,5 @@ services:
       - 8000:8000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/docker/appdata/portainer:/data
+      - /docker/appdata/portainer:/data
     restart: unless-stopped

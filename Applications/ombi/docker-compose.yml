@@ -11,5 +11,5 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - /home/docker/appdata/ombi/config:/config
+      - /docker/appdata/ombi/config:/config
     restart: unless-stopped
