@@ -5,7 +5,7 @@
 #        "user:$apsdfswWvC/6.$E3FtsfTntPC0wVJ7IUVtX1",
 #      ]
       realm = "Traefik2 Basic Auth"
-      usersFile = "/shared/.htpasswd"
+      usersFile = "/home/sf-service/Docker/shared/.htpasswd"
 
   [http.middlewares.middlewares-rate-limit]
     [http.middlewares.middlewares-rate-limit.rateLimit]
