@@ -109,10 +109,10 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.heimdall-rtr.entrypoints=https"
-      - "traefik.http.routers.heimdall-rtr.rule=Host(`heimdall.$DOMAINNAME0`)"
+      - "traefik.http.routers.heimdall-rtr.entrypoints=http"
+      - "traefik.http.routers.heimdall-rtr.rule=Host(`heimdall.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.heimdall-rtr.middlewares=chain-oauth@file"
+      - "traefik.http.routers.heimdall-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
       - "traefik.http.services.heimdall-svc.loadbalancer.server.port=80"
