@@ -212,7 +212,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.wikijs-rtr.entrypoints=https"
-      - "traefik.http.routers.wikijs-rtr.rule=Host(`wiki.$DOMAINNAME`)"
+      - "traefik.http.routers.wikijs-rtr.rule=Host(`wikijs.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.wikijs-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
