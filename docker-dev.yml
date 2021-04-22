@@ -317,5 +317,5 @@ services:
       ## Middlewares
       - "traefik.http.routers.hydra2-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.hydra2-rtr.service=freshrss-svc"
+      - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
       - "traefik.http.services.hydra2-svc.loadbalancer.server.port=5076"
