@@ -186,7 +186,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.fressrss-rtr.entrypoints=https"
-      - "traefik.http.routers.freshrss-rtr.rule=Host(`rss.$DOMAINNAME`)"
+      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
