@@ -188,6 +188,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.fressrss-rtr.entrypoints=websecure"
       - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+      - "traefik.http.routers.freshrss-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
