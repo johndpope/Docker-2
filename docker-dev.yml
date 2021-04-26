@@ -93,188 +93,187 @@ services:
       - "traefik.http.routers.traefik-rtr.service=api@internal"
       ## Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
-  #
-  # portainer:
-  #   container_name: portainer
-  #   image: portainer/portainer-ce:latest
-  #   restart: unless-stopped
-  #   # command: -H unix:///var/run/docker.sock # # Use Docker Socket Proxy instead for improved security
-  #   command: -H unix:///var/run/docker.sock
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     # - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
-  #     - $DOCKERDIR/portainer:/data # Change to local directory if you want to save/transfer config locally
-  #   environment:
-  #     - TZ=$TZ
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.portainer-rtr.entrypoints=https"
-  #     - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-  #     - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
-  #
-  # organizr:
-  #   image: organizr/organizr
-  #   container_name: organizr
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/organizr:/config
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.organizr-rtr.entrypoints=https"
-  #     - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.organizr-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.organizr-rtr.service=organizr-svc"
-  #     - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
-  #
-  # heimdall:
-  #   container_name: heimdall
-  #   image: linuxserver/heimdall:latest
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - "$HEIMDALL_PORT:80"
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/heimdall:/config
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.heimdall-rtr.entrypoints=https"
-  #     - "traefik.http.routers.heimdall-rtr.rule=Host(`heimdall.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.heimdall-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
-  #     - "traefik.http.services.heimdall-svc.loadbalancer.server.port=80"
 
-  # freshrss:
-  #   image: linuxserver/freshrss
-  #   container_name: freshrss
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #    - no-new-privileges:true
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/freshrss:/config
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.fressrss-rtr.entrypoints=websecure"
-  #     - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
-  #     - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
-  #
-  # wikijs:
-  #   image: linuxserver/wikijs
-  #   container_name: wikijs
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/wikijs:/config
-  #     - $DOCKERDIR/wikijs/data:/data
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.wikijs-rtr.entrypoints=https"
-  #     - "traefik.http.routers.wikijs-rtr.entrypoints=http"
-  #     - "traefik.http.routers.wikijs-rtr.rule=Host(`wikijs.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.wikijs-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.wikijs-rtr.service=wikijs-svc"
-  #     - "traefik.http.services.wikijs-svc.loadbalancer.server.port=3000"
-  #
-  # ombi:
-  #   image: ghcr.io/linuxserver/ombi
-  #   container_name: ombi
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/ombi/config:/config
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.ombi-rtr.entrypoints=https"
-  #     - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.ombi-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.ombi-rtr.service=ombi-svc"
-  #     - "traefik.http.services.ombi-svc.loadbalancer.server.port=3579"
-  #
-  # tautulli:
-  #   image: linuxserver/tautulli
-  #   container_name: tautulli
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/tautulli:/config
-  #     - $DOCKERDIR/tautulli/logs:/logs
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.tautulli-rtr.entrypoints=https"
-  #     - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
-  #     - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
-  #
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+      - $DOCKERDIR/portainer:/data # Change to local directory if you want to save/transfer config locally
+    environment:
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.portainer-rtr.entrypoints=https"
+      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
+      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+
+  organizr:
+    image: organizr/organizr
+    container_name: organizr
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/organizr:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.organizr-rtr.entrypoints=https"
+      - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.organizr-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.organizr-rtr.service=organizr-svc"
+      - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
+
+  heimdall:
+    container_name: heimdall
+    image: linuxserver/heimdall:latest
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "$HEIMDALL_PORT:80"
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/heimdall:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.heimdall-rtr.entrypoints=https"
+      - "traefik.http.routers.heimdall-rtr.rule=Host(`heimdall.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.heimdall-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
+      - "traefik.http.services.heimdall-svc.loadbalancer.server.port=80"
+
+  freshrss:
+    image: linuxserver/freshrss
+    container_name: freshrss
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+     - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/freshrss:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.fressrss-rtr.entrypoints=websecure"
+      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
+      - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
+
+  wikijs:
+    image: linuxserver/wikijs
+    container_name: wikijs
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/wikijs:/config
+      - $DOCKERDIR/wikijs/data:/data
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.wikijs-rtr.entrypoints=https"
+#      - "traefik.http.routers.wikijs-rtr.entrypoints=http"
+      - "traefik.http.routers.wikijs-rtr.rule=Host(`wikijs.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.wikijs-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.wikijs-rtr.service=wikijs-svc"
+      - "traefik.http.services.wikijs-svc.loadbalancer.server.port=3000"
+
+  ombi:
+    image: ghcr.io/linuxserver/ombi
+    container_name: ombi
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/ombi/config:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.ombi-rtr.entrypoints=https"
+      - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.ombi-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.ombi-rtr.service=ombi-svc"
+      - "traefik.http.services.ombi-svc.loadbalancer.server.port=3579"
+
+  tautulli:
+    image: linuxserver/tautulli
+    container_name: tautulli
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/tautulli:/config
+      - $DOCKERDIR/tautulli/logs:/logs
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.tautulli-rtr.entrypoints=https"
+      - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
+      - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
+
   jackett:
     image: linuxserver/jackett
     container_name: jackett
@@ -299,28 +298,28 @@ services:
        ## HTTP Services
       - "traefik.http.routers.jackett-rtr.service=jackett-svc"
       - "traefik.http.services.jackett-svc.loadbalancer.server.port=9117"
-  #
-  # hydra2:
-  #   image: linuxserver/hydra2
-  #   container_name: hydra2
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/hydra2:/config
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.hydra2-rtr.entrypoints=https"
-  #     - "traefik.http.routers.hydra2-rtr.rule=Host(`hydra2.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.hydra2-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
-  #     - "traefik.http.services.hydra2-svc.loadbalancer.server.port=5076"
+
+  hydra2:
+    image: linuxserver/hydra2
+    container_name: hydra2
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/hydra2:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.hydra2-rtr.entrypoints=https"
+      - "traefik.http.routers.hydra2-rtr.rule=Host(`hydra2.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.hydra2-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
+      - "traefik.http.services.hydra2-svc.loadbalancer.server.port=5076"
