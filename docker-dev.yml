@@ -139,6 +139,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.organizr-rtr.entrypoints=websecure"
       - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
+      - "traefik.http.routers.organizr-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.organizr-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
@@ -269,6 +270,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.tautulli-rtr.entrypoints=websecure"
       - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME`)"
+      - "traefik.http.routers.tautulli-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
