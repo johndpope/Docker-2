@@ -226,6 +226,33 @@ services:
       - "traefik.http.routers.wikijs-rtr.service=wikijs-svc"
       - "traefik.http.services.wikijs-svc.loadbalancer.server.port=3000"
 
+  mealie:
+    image: hkotel/mealie
+    container_name: mealie
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - db_type= sqlite
+    volumes:
+      - $DOCKERDIR/mealie:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.mealie-rtr.entrypoints=websecure"
+      - "traefik.http.routers.mealie-rtr.rule=Host(`recipe.$DOMAINNAME`)"
+      - "traefik.http.routers.mealie-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.mealie-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.mealie-rtr.service=mealie-svc"
+      - "traefik.http.services.mealie-svc.loadbalancer.server.port=80"
+
   ombi:
     image: ghcr.io/linuxserver/ombi
     container_name: ombi
