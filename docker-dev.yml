@@ -242,6 +242,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.ombi-rtr.entrypoints=websecure"
       - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
+      - "traefik.http.routers.ombi-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.ombi-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
