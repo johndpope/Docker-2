@@ -63,7 +63,7 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - $DOCKERDIR/traefik2/rules:/rules
+      - $DOCKERDIR/shared/rules:/rules
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKERDIR/traefik2/acme/acme.json:/acme.json
       - $DOCKERDIR/traefik2/traefik.log:/traefik.log
