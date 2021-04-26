@@ -292,7 +292,11 @@ services:
      labels:
        - "traefik.enable=true"
        ## HTTP Routers
+<<<<<<< HEAD
        - "traefik.http.routers.jackett-rtr.entrypoints=websecure"
+=======
+       - "traefik.http.routers.jackett-rtr.entrypoints=https"
+>>>>>>> 9da9e9d3594829552d59c37dcc4b9a920f398016
        - "traefik.http.routers.jackett-rtr.rule=Host(`jackett.$DOMAINNAME`)"
        ## Middlewares
        - "traefik.http.routers.jackett-rtr.middlewares=middlewares-basic-auth@file"
