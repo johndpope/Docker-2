@@ -172,31 +172,31 @@ services:
   #     - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
   #     - "traefik.http.services.heimdall-svc.loadbalancer.server.port=80"
 
-  freshrss:
-    image: linuxserver/freshrss
-    container_name: freshrss
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-     - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-      - $DOCKERDIR/freshrss:/config
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.fressrss-rtr.entrypoints=websecure"
-      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
-      - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
-
+  # freshrss:
+  #   image: linuxserver/freshrss
+  #   container_name: freshrss
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #    - no-new-privileges:true
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #   volumes:
+  #     - $DOCKERDIR/freshrss:/config
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.fressrss-rtr.entrypoints=websecure"
+  #     - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
+  #     - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
+  #
   # wikijs:
   #   image: linuxserver/wikijs
   #   container_name: wikijs
