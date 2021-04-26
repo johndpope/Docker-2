@@ -238,7 +238,7 @@ services:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-      - db_type= sqlite
+      - db_type=sqlite
     volumes:
       - $DOCKERDIR/mealie:/config
     labels:
