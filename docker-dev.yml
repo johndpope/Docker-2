@@ -275,30 +275,30 @@ services:
   #     - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
   #     - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
   #
-  # jackett:
-  #   image: linuxserver/jackett
-  #   container_name: jackett
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #   volumes:
-  #     - $DOCKERDIR/jackett:/config
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.jackett-rtr.entrypoints=https"
-  #     - "traefik.http.routers.jackett-rtr.rule=Host(`jackett.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.jackett-rtr.middlewares=middlewares-basic-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.jackett-rtr.service=jackett-svc"
-  #     - "traefik.http.services.jackett-svc.loadbalancer.server.port=9117"
+   jackett:
+     image: linuxserver/jackett
+     container_name: jackett
+     restart: unless-stopped
+     networks:
+       - t2_proxy
+     security_opt:
+       - no-new-privileges:true
+     environment:
+       - PUID=$PUID
+       - PGID=$PGID
+       - TZ=$TZ
+     volumes:
+       - $DOCKERDIR/jackett:/config
+     labels:
+       - "traefik.enable=true"
+       ## HTTP Routers
+       - "traefik.http.routers.jackett-rtr.entrypoints=https"
+       - "traefik.http.routers.jackett-rtr.rule=Host(`jackett.$DOMAINNAME`)"
+       ## Middlewares
+       - "traefik.http.routers.jackett-rtr.middlewares=middlewares-basic-auth@file"
+       ## HTTP Services
+       - "traefik.http.routers.jackett-rtr.service=jackett-svc"
+       - "traefik.http.services.jackett-svc.loadbalancer.server.port=9117"
   #
   # hydra2:
   #   image: linuxserver/hydra2
