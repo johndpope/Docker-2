@@ -113,6 +113,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
       - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
+      - "traefik.http.routers.portainer-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
