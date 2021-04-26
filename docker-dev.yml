@@ -93,7 +93,7 @@ services:
       - "traefik.http.routers.traefik-rtr.service=api@internal"
       ## Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
-      
+
   portainer:
     container_name: portainer
     image: portainer/portainer-ce:latest
@@ -240,7 +240,7 @@ services:
       - TZ=$TZ
       - db_type=sqlite
     volumes:
-      - $DOCKERDIR/mealie:/config
+      - $DOCKERDIR/mealie/data/:/app/data
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
