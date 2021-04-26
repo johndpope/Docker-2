@@ -93,34 +93,7 @@ services:
       - "traefik.http.routers.traefik-rtr.service=api@internal"
       ## Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
-
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-       - $DOCKERDIR/watchtower:/config
-       - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - "traefik.enable=true"
-       ## HTTP Routers
-      - "traefik.http.routers.watchtower-rtr.entrypoints=websecure"
-      - "traefik.http.routers.watchtower-rtr.rule=Host(`watchtower.$DOMAINNAME`)"
-      - "traefik.http.routers.watchtower-rtr.tls=true"
-       ## Middlewares
-      - "traefik.http.routers.watchtower-rtr.middlewares=middlewares-basic-auth@file"
-       ## HTTP Services
-      - "traefik.http.routers.watchtower-rtr.service=watchtower-svc"
-      - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"
-
+      
   portainer:
     container_name: portainer
     image: portainer/portainer-ce:latest
