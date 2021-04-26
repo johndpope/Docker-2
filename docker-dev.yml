@@ -108,6 +108,7 @@ services:
       - TZ=$TZ
     volumes:
        - $DOCKERDIR/watchtower:/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
        ## HTTP Routers
