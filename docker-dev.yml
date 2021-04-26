@@ -111,7 +111,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.portainer-rtr.entrypoints=https"
+      - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
       - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
@@ -136,7 +136,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.organizr-rtr.entrypoints=https"
+      - "traefik.http.routers.organizr-rtr.entrypoints=websecure"
       - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.organizr-rtr.middlewares=middlewares-basic-auth@file"
@@ -152,8 +152,6 @@ services:
       - t2_proxy
     security_opt:
       - no-new-privileges:true
-    ports:
-      - "$HEIMDALL_PORT:80"
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -163,7 +161,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.heimdall-rtr.entrypoints=https"
+      - "traefik.http.routers.heimdall-rtr.entrypoints=websecure"
       - "traefik.http.routers.heimdall-rtr.rule=Host(`heimdall.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.heimdall-rtr.middlewares=middlewares-basic-auth@file"
@@ -214,7 +212,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.wikijs-rtr.entrypoints=https"
+      - "traefik.http.routers.wikijs-rtr.entrypoints=websecure"
 #      - "traefik.http.routers.wikijs-rtr.entrypoints=http"
       - "traefik.http.routers.wikijs-rtr.rule=Host(`wikijs.$DOMAINNAME`)"
       ## Middlewares
@@ -240,7 +238,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.ombi-rtr.entrypoints=https"
+      - "traefik.http.routers.ombi-rtr.entrypoints=websecure"
       - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.ombi-rtr.middlewares=middlewares-basic-auth@file"
@@ -266,7 +264,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.tautulli-rtr.entrypoints=https"
+      - "traefik.http.routers.tautulli-rtr.entrypoints=websecure"
       - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
@@ -316,7 +314,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.hydra2-rtr.entrypoints=https"
+      - "traefik.http.routers.hydra2-rtr.entrypoints=websecure"
       - "traefik.http.routers.hydra2-rtr.rule=Host(`hydra2.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.hydra2-rtr.middlewares=middlewares-basic-auth@file"
