@@ -375,6 +375,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.airsonic-rtr.entrypoints=websecure"
       - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.airsonic-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.airsonic-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
