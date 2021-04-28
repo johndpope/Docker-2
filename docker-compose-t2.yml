@@ -359,6 +359,10 @@ services:
     image: ghcr.io/linuxserver/airsonic
     container_name: airsonic
     restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
     environment:
       - PUID=$PUID
       - PGID=$PGID
