@@ -218,7 +218,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.wikijs-rtr.entrypoints=websecure"
       - "traefik.http.routers.wikijs-rtr.rule=Host(`wikijs.$DOMAINNAME`)"
-      - "traefik.http.routers.heimdall-rtr.tls=true"
+      - "traefik.http.routers.wikijs-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.wikijs-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
