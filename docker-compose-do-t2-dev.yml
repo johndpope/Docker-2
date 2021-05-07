@@ -68,3 +68,21 @@ services:
       - 4002:443
     volumes:
       - $DOCKERDIR/heimdall/config:/config
+
+  overseerr:
+    container_name: overseerr
+    image: ghcr.io/linuxserver/overseerr
+    environment:
+    restart: unless-stopped
+    networks:
+      - default
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    ports:
+      - 2004:5055
+    volumes:
+      - $DOCKERDIR/overseerr/config:/config
