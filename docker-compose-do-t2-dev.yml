@@ -83,6 +83,6 @@ services:
       - PGID=$PGID
       - TZ=$TZ
     ports:
-      - 2004:5055
+      - 4004:5055
     volumes:
       - $DOCKERDIR/overseerr/config:/config
