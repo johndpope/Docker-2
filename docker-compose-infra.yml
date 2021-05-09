@@ -19,7 +19,6 @@ services:
     restart: unless-stopped
     networks:
       - default
-      - wireguard
     security_opt:
       - no-new-privileges:true
     cap_add:
@@ -31,14 +30,14 @@ services:
       - TZ=$TZ
       - SERVERURL=wireguard.whitehome.io #optional
       - SERVERPORT=51820 #optional
-      - PEERS=4 #optional
+      - PEERS= #optional
       - PEERDNS=auto #optional
       - INTERNAL_SUBNET=10.229.180.0 #optional
       - ALLOWEDIPS=0.0.0.0/0 #optional
     ports:
       - 51820:51820/udp
     volumes:
-      - $DOCKERDIR/wireguard/config:/config
+      - $DOCKERDIR/wireguard:/config
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
