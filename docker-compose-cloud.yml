@@ -3,25 +3,16 @@ version: "3.7"
 
 ########################### NETWORKS
 networks:
+  t2_proxy:
+    external:
+      name: t2_proxy
+  wireguard:
+    external:
+      name: wireguard
   default:
     driver: bridge
 
 services:
-  nginx-proxy-manager:
-    container_name: nginx-proxy-manager
-    image: jlesage/nginx-proxy-manager
-    restart: unless-stopped
-    networks:
-      - default
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - 8181:8181
-      - 80:80
-      - 443:443
-    volumes:
-      - $DOCKERDIR/nginx-proxy-manager:/config:rw
-
   wireguard:
     container_name: wireguard
     image: ghcr.io/linuxserver/wireguard
@@ -50,39 +41,3 @@ services:
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-
-  heimdall:
-    container_name: heimdall
-    image: ghcr.io/linuxserver/heimdall
-    restart: unless-stopped
-    networks:
-      - default
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    ports:
-      - 4000:80
-      - 4002:443
-    volumes:
-      - $DOCKERDIR/heimdall/config:/config
-
-  overseerr:
-    container_name: overseerr
-    image: ghcr.io/linuxserver/overseerr
-    environment:
-    restart: unless-stopped
-    networks:
-      - default
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    ports:
-      - 4004:5055
-    volumes:
-      - $DOCKERDIR/overseerr/config:/config
