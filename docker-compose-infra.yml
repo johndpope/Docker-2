@@ -6,6 +6,9 @@ networks:
   t2_proxy:
     external:
       name: t2_proxy
+  wireguard:
+    external:
+      name: wireguard
   default:
     driver: bridge
 
@@ -16,6 +19,7 @@ services:
     restart: unless-stopped
     networks:
       - default
+      - wireguard
     security_opt:
       - no-new-privileges:true
     cap_add:
