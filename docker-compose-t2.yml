@@ -376,3 +376,65 @@ services:
       ## HTTP Services
       - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
       - "traefik.http.services.hydra2-svc.loadbalancer.server.port=5076"
+
+  airsonic:
+    image: ghcr.io/linuxserver/airsonic
+    container_name: airsonic
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+#      - CONTEXT_PATH=<URL_BASE> #optional
+#      - JAVA_OPTS=<options> #optional
+    volumes:
+      - $DOCKERDIR/airsonic:/config
+      - $MEDIADIR/Audio/Collection:/music
+      - $MEDIADIR/Audio/Playlists:/playlists
+      - $MEDIADIR/Audio/Podcasts:/podcasts
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.airsonic-rtr.entrypoints=websecure"
+      - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.airsonic-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.airsonic-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
+      - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # Optional: put your config options customization here. Examples:
+      ND_SCANINTERVAL: 1m
+      ND_LOGLEVEL: info
+      ND_BASEURL: ""
+    volumes:
+      - $DOCKERDIR/navidrome:/data"
+      - $MEDIADIR/Audio/Collection:/music:ro"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.navidrome-rtr.entrypoints=websecure"
+      - "traefik.http.routers.navidrome-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.navidrome-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.navidrome-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.navidrome-rtr.service=airsonic-svc"
+      - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
