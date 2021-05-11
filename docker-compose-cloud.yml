@@ -52,7 +52,7 @@ services:
     ports:
       - 51820:51820/udp
     volumes:
-      - $DOCKERDIR/wireguard/config:/config
+      - $DOCKERDIR/wireguard:/config
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
@@ -73,7 +73,7 @@ services:
       - 4000:80
       - 4002:443
     volumes:
-      - $DOCKERDIR/heimdall/config:/config
+      - $DOCKERDIR/heimdall:/config
 
   overseerr:
     container_name: overseerr
@@ -91,4 +91,4 @@ services:
     ports:
       - 4004:5055
     volumes:
-      - $DOCKERDIR/overseerr/config:/config
+      - $DOCKERDIR/overseerr:/config
