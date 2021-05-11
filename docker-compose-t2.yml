@@ -274,32 +274,6 @@ services:
       - "traefik.http.routers.mealie-rtr.service=mealie-svc"
       - "traefik.http.services.mealie-svc.loadbalancer.server.port=80"
 
-  ombi:
-    image: ghcr.io/linuxserver/ombi
-    container_name: ombi
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-      - $DOCKERDIR/ombi/config:/config
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.ombi-rtr.entrypoints=websecure"
-      - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
-      - "traefik.http.routers.ombi-rtr.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.ombi-rtr.middlewares=middlewares-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.ombi-rtr.service=ombi-svc"
-      - "traefik.http.services.ombi-svc.loadbalancer.server.port=3579"
-
   tautulli:
     image: linuxserver/tautulli
     container_name: tautulli
