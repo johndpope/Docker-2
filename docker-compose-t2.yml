@@ -413,7 +413,7 @@ services:
       - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
       - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
 
-    lidarr:
+  lidarr:
     image: ghcr.io/linuxserver/lidarr
     container_name: lidarr
     restart: unless-stopped
