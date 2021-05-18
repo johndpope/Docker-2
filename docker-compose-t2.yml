@@ -410,5 +410,35 @@ services:
       ## Middlewares
       - "traefik.http.routers.navidrome-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.navidrome-rtr.service=airsonic-svc"
+      - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
       - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
+
+    lidarr:
+    image: ghcr.io/linuxserver/lidarr
+    container_name: lidarr
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+#    ports:
+#      - 8686:8686
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/lidarr:/config
+      - $MEDIADIR/Audio/Music:/music
+      - $MEDIAGATEDIR/process/Audio/Music:/downloads
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.lidarr-rtr.entrypoints=websecure"
+      - "traefik.http.routers.lidarr-rtr.rule=Host(`lidarr.$DOMAINNAME`)"
+      - "traefik.http.routers.lidarr-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.lidarr-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
+      - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
