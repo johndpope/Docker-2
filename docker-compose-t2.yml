@@ -395,9 +395,9 @@ services:
       - PGID=$PGID
       - TZ=$TZ
       # Optional: put your config options customization here. Examples:
-      ND_SCANINTERVAL: 1m
-      ND_LOGLEVEL: info
-      ND_BASEURL: ""
+      - ND_SCANINTERVAL=1m
+      - ND_LOGLEVEL=info
+      - ND_BASEURL=""
     volumes:
       - $DOCKERDIR/navidrome:/data"
       - $MEDIADIR/Audio/Collection:/music:ro"
