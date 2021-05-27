@@ -380,3 +380,17 @@ services:
       ## HTTP Services
       - "traefik.http.routers.airsonic-rtr.service=hydra2-svc"
       - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+
+  homeassistant:
+    image: ghcr.io/linuxserver/homeassistant
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/homeassistant:/config
+#    devices:
+#      - /path/to/device:/path/to/device
