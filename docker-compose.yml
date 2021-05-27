@@ -16,7 +16,9 @@ services:
     restart: unless-stopped
     command: -H unix:///var/run/docker.sock
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $portainer-port:9000
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -31,6 +33,8 @@ services:
     restart: unless-stopped
     networks:
       - default
+    ports:
+      - 8686:8686
     security_opt:
       - no-new-privileges:true
     cap_add:
@@ -52,7 +56,9 @@ services:
     container_name: organizr
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $organizr-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -67,7 +73,9 @@ services:
     image: linuxserver/heimdall:latest
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $heimdall-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -82,7 +90,9 @@ services:
     container_name: freshrss
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $freshrss-port:8686
     security_opt:
      - no-new-privileges:true
     environment:
@@ -97,7 +107,9 @@ services:
     container_name: wikijs
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $wikijs-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -113,7 +125,9 @@ services:
     container_name: mealie
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $mealie-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -129,7 +143,9 @@ services:
     container_name: tautulli
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $tautulli-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -145,7 +161,9 @@ services:
     container_name: jackett
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $jackett-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -160,7 +178,9 @@ services:
     container_name: hydra2
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $hydra-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -175,7 +195,9 @@ services:
     container_name: airsonic
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $airsonic-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -195,7 +217,9 @@ services:
     container_name: navidrome
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - default
+    ports:
+      - $navidrome-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -215,9 +239,9 @@ services:
     container_name: lidarr
     restart: unless-stopped
     networks:
-      - t2_proxy
-#    ports:
-#      - 8686:8686
+      - default
+    ports:
+      - $lidarr-port:8686
     security_opt:
       - no-new-privileges:true
     environment:
