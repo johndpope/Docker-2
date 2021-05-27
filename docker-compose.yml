@@ -1,0 +1,244 @@
+version: "3.7"
+# MAIN DOCKER-COMPOSE
+
+########################### NETWORKS
+networks:
+  t2_proxy:
+    external:
+      name: t2_proxy
+  default:
+    driver: bridge
+
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+      - $DOCKERDIR/portainer:/data # Change to local directory if you want to save/transfer config locally
+    environment:
+      - TZ=$TZ
+
+  wireguard:
+    container_name: wireguard
+    image: ghcr.io/linuxserver/wireguard
+    restart: unless-stopped
+    networks:
+      - default
+    security_opt:
+      - no-new-privileges:true
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - SERVERURL=wireguard.whitehome.io #optional
+      - SERVERPORT=51820 #optional
+      - PEERS=4 #optional
+      - PEERDNS=auto #optional
+      - INTERNAL_SUBNET=10.229.180.0 #optional
+      - ALLOWEDIPS=0.0.0.0/0 #optional
+
+  organizr:
+    image: organizr/organizr
+    container_name: organizr
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/organizr:/config
+
+  heimdall:
+    container_name: heimdall
+    image: linuxserver/heimdall:latest
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/heimdall:/config
+
+  freshrss:
+    image: linuxserver/freshrss
+    container_name: freshrss
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+     - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/freshrss:/config
+
+  wikijs:
+    image: linuxserver/wikijs
+    container_name: wikijs
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/wikijs:/config
+      - $DOCKERDIR/wikijs/data:/data
+
+  mealie:
+    image: hkotel/mealie
+    container_name: mealie
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - db_type=sqlite
+    volumes:
+      - $DOCKERDIR/mealie/data/:/app/data
+
+  tautulli:
+    image: linuxserver/tautulli
+    container_name: tautulli
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/tautulli:/config
+      - $DOCKERDIR/tautulli/logs:/logs
+
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+       - $DOCKERDIR/jackett:/config
+
+  hydra2:
+    image: linuxserver/hydra2
+    container_name: hydra2
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/hydra2:/config
+
+  airsonic:
+    image: ghcr.io/linuxserver/airsonic
+    container_name: airsonic
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+#      - CONTEXT_PATH=<URL_BASE> #optional
+#      - JAVA_OPTS=<options> #optional
+    volumes:
+      - $DOCKERDIR/airsonic:/config
+      - $MEDIADIR/Audio/Collection:/music
+      - $MEDIADIR/Audio/Playlists:/playlists
+      - $MEDIADIR/Audio/Podcasts:/podcasts
+
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # Optional: put your config options customization here. Examples:
+      - ND_SCANINTERVAL=1m
+      - ND_LOGLEVEL=info
+      - ND_BASEURL=""
+    volumes:
+      - $DOCKERDIR/navidrome:/data"
+      - $MEDIADIR/Audio/Collection:/music"
+
+  lidarr:
+    image: ghcr.io/linuxserver/lidarr
+    container_name: lidarr
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+#    ports:
+#      - 8686:8686
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/lidarr:/config
+      - $MEDIADIR/Audio/Music:/music
+      - $MEDIAGATEDIR/process/Audio/Music:/downloads
+
+  homeassistant:
+    image: ghcr.io/linuxserver/homeassistant
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/homeassistant:/config
+#    devices:
+#      - /path/to/device:/path/to/device
