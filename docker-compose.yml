@@ -18,7 +18,7 @@ services:
     networks:
       - default
     ports:
-      - $portainer-port:9000
+      - $portainer_port:9000
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -58,7 +58,7 @@ services:
     networks:
       - default
     ports:
-      - $organizr-port:8686
+      - $organizr_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -75,7 +75,7 @@ services:
     networks:
       - default
     ports:
-      - $heimdall-port:8686
+      - $heimdall_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -92,7 +92,7 @@ services:
     networks:
       - default
     ports:
-      - $freshrss-port:8686
+      - $freshrss_port:8686
     security_opt:
      - no-new-privileges:true
     environment:
@@ -109,7 +109,7 @@ services:
     networks:
       - default
     ports:
-      - $wikijs-port:8686
+      - $wikijs_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -127,7 +127,7 @@ services:
     networks:
       - default
     ports:
-      - $mealie-port:8686
+      - $mealie_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -145,7 +145,7 @@ services:
     networks:
       - default
     ports:
-      - $tautulli-port:8686
+      - $tautulli_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -163,7 +163,7 @@ services:
     networks:
       - default
     ports:
-      - $jackett-port:8686
+      - $jackett_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -180,7 +180,7 @@ services:
     networks:
       - default
     ports:
-      - $hydra-port:8686
+      - $hydra_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -197,7 +197,7 @@ services:
     networks:
       - default
     ports:
-      - $airsonic-port:8686
+      - $airsonic_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -219,7 +219,7 @@ services:
     networks:
       - default
     ports:
-      - $navidrome-port:8686
+      - $navidrome_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
@@ -241,7 +241,7 @@ services:
     networks:
       - default
     ports:
-      - $lidarr-port:8686
+      - $lidarr_port:8686
     security_opt:
       - no-new-privileges:true
     environment:
