@@ -3,11 +3,12 @@ version: "3.7"
 
 ########################### NETWORKS
 networks:
-  t2_proxy:
-    external:
-      name: t2_proxy
-  default:
+  frontend:
     driver: bridge
+    internal: false
+  backend:
+    driver: bridge
+    internal: true
 
 services:
   portainer:
@@ -16,7 +17,7 @@ services:
     restart: unless-stopped
     command: -H unix:///var/run/docker.sock
     networks:
-      - default
+      - frontend
     ports:
       - $portainer_port:9000
     security_opt:
@@ -32,7 +33,7 @@ services:
     image: ghcr.io/linuxserver/wireguard
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - 8686:8686
     security_opt:
@@ -56,7 +57,7 @@ services:
     container_name: organizr
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $organizr_port:8686
     security_opt:
@@ -73,7 +74,7 @@ services:
     image: linuxserver/heimdall:latest
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $heimdall_port:8686
     security_opt:
@@ -90,7 +91,7 @@ services:
     container_name: freshrss
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $freshrss_port:8686
     security_opt:
@@ -107,7 +108,7 @@ services:
     container_name: wikijs
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $wikijs_port:8686
     security_opt:
@@ -125,7 +126,7 @@ services:
     container_name: mealie
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $mealie_port:8686
     security_opt:
@@ -143,7 +144,7 @@ services:
     container_name: tautulli
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $tautulli_port:8686
     security_opt:
@@ -161,7 +162,7 @@ services:
     container_name: jackett
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $jackett_port:8686
     security_opt:
@@ -178,7 +179,7 @@ services:
     container_name: hydra2
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $hydra_port:8686
     security_opt:
@@ -195,7 +196,7 @@ services:
     container_name: airsonic
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $airsonic_port:8686
     security_opt:
@@ -217,7 +218,7 @@ services:
     container_name: navidrome
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $navidrome_port:8686
     security_opt:
@@ -239,7 +240,7 @@ services:
     container_name: lidarr
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     ports:
       - $lidarr_port:8686
     security_opt:
@@ -272,7 +273,7 @@ services:
     container_name: gitea
     restart: unless-stopped
     networks:
-      - default
+      - frontend
       - backend
     ports:
       - "3000:3000"
@@ -290,14 +291,16 @@ services:
 
   db:
     image: mariadb:10
-    container_name: gitea
+    container_name: db
     restart: unless-stopped
     networks:
       - backend
+    security_opt:
+      - no-new-privileges:true
     environment:
-      - MYSQL_ROOT_PASSWORD=changeme
-      - MYSQL_DATABASE=gitea
-      - MYSQL_USER=gitea
-      - MYSQL_PASSWORD=changeme
+      - MYSQL_ROOT_PASSWORD=$ROOT_SQL_PASSWORD
+      - MYSQL_DATABASE=$GITEA_SQL_DATABASE
+      - MYSQL_USER=$GITEA_SQL_USER
+      - MYSQL_PASSWORD=$GITEA_SQL_PASSWORD
     volumes:
       - $DOCKERDIR/db/:/var/lib/mysql
