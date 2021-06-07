@@ -4,10 +4,10 @@ version: "3.7"
 ########################### NETWORKS
 networks:
   frontend:
-    driver: bridge
+    driver: overlay
     internal: false
   backend:
-    driver: bridge
+    driver: overlay
     internal: true
 
 services:
