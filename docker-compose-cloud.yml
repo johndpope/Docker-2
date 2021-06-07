@@ -1,7 +1,6 @@
 version: "3.7"
 # Docker compose file for Digital Ocean Droplets
 
-########################### NETWORKS
 networks:
   frontend:
     driver: bridge
