@@ -195,6 +195,25 @@ services:
       - $DOCKERDIR/navidrome:/data"
       - $MEDIADIR/Audio/Collection:/music"
 
+
+  overseerr:
+    container_name: overseerr
+    image: ghcr.io/linuxserver/overseerr
+    environment:
+    restart: unless-stopped
+    networks:
+      - default
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    ports:
+      - $OVERSEERR_PORT:5055
+    volumes:
+      - $DOCKERDIR/overseerr:/config
+
   lidarr:
     image: ghcr.io/linuxserver/lidarr
     container_name: lidarr
