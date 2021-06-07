@@ -202,7 +202,7 @@ services:
     environment:
     restart: unless-stopped
     networks:
-      - default
+      - frontend
     security_opt:
       - no-new-privileges:true
     environment:
