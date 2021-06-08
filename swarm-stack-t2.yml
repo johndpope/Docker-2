@@ -1,13 +1,9 @@
 version: "3.7"
 # MAIN DOCKER-COMPOSE
 
-########################### NETWORKS
 networks:
   t2_proxy:
-    external:
-      name: t2_proxy
-  default:
-    driver: bridge
+    external: true
 
 services:
 # Traefik 2 - Reverse Proxy
@@ -15,6 +11,12 @@ services:
     container_name: traefik
     image: traefik:2.2.1 # the chevrotin tag refers to v2.2.x but introduced a breaking change in 2.2.2
     restart: unless-stopped
+    deploy:
+      placement:
+        constraints:
+          # Make the traefik service run only on the node with this label
+          # as the node with it has the volume for the certificates
+          - node.labels.traefik-public.traefik-public-certificates == true
     command: # CLI arguments
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=true
