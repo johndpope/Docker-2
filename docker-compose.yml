@@ -274,7 +274,7 @@ services:
     networks:
       - backend
     ports:
-        - 5432:5432
+      - 5432:5432
     environment:
       - PUID=$PUID
       - PGID=$PGID
