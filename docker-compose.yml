@@ -259,7 +259,7 @@ services:
       - frontend
       - backend
     environment:
-        - APP_BASE_URL=$APP_BASE_URL
+#        - APP_BASE_URL=$APP_BASE_URL
         - DB_CLIENT=pg
         - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
         - POSTGRES_DATABASE=$POSTGRES_DATABASE
@@ -274,7 +274,7 @@ services:
     networks:
       - backend
     ports:
-        - "5432:5432"
+        - 5432:5432
     environment:
       - PUID=$PUID
       - PGID=$PGID
