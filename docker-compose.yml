@@ -254,7 +254,7 @@ services:
         - postgres
     restart: unless-stopped
     ports:
-      - $JOPLIN_PORT:22300"
+      - $JOPLIN_PORT:22300
     networks:
       - frontend
       - backend
