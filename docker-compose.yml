@@ -11,6 +11,21 @@ networks:
     internal: true
 
 services:
+  nginx-proxy-manager:
+    container_name: nginx-proxy-manager
+    image: jlesage/nginx-proxy-manager
+    restart: unless-stopped
+    networks:
+      - frontend
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 8181:8181
+      - 80:8080
+      - 443:4443
+    volumes:
+      - $DOCKERDIR/nginx-proxy-manager:/config:rw
+
   organizr:
     image: organizr/organizr
     container_name: organizr
