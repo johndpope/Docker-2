@@ -8,7 +8,7 @@ networks:
 services:
   nginx-proxy-manager:
     container_name: nginx-proxy-manager
-    image: jlesage/nginx-proxy-manager
+    image: jc21/nginx-proxy-manager
     restart: unless-stopped
     networks:
       - frontend
