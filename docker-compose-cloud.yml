@@ -15,8 +15,8 @@ services:
     security_opt:
       - no-new-privileges:true
     ports:
-      - 8181:8181
-      - 80:8080
-      - 443:4443
+      - 81:81
+      - 80:80
+      - 443:443
     volumes:
       - $DOCKERDIR/nginx-proxy-manager:/config:rw
