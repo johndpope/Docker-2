@@ -120,28 +120,6 @@ services:
       - "traefik.http.routers.portainer-rtr.service=portainer-svc"
       - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
 
-  wireguard:
-    container_name: wireguard
-    image: ghcr.io/linuxserver/wireguard
-    restart: unless-stopped
-    networks:
-      - default
-    security_opt:
-      - no-new-privileges:true
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - SERVERURL=wireguard.whitehome.io #optional
-      - SERVERPORT=51820 #optional
-      - PEERS=4 #optional
-      - PEERDNS=auto #optional
-      - INTERNAL_SUBNET=10.229.180.0 #optional
-      - ALLOWEDIPS=0.0.0.0/0 #optional
-
   organizr:
     image: organizr/organizr
     container_name: organizr
@@ -300,6 +278,35 @@ services:
       - "traefik.http.routers.ombi-rtr.service=ombi-svc"
       - "traefik.http.services.ombi-svc.loadbalancer.server.port=3579"
 
+  overseerr:
+    container_name: overseerr
+    image: ghcr.io/linuxserver/overseerr
+    environment:
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+#    ports:
+#      - $OVERSEERR_PORT:5055
+    volumes:
+      - $DOCKERDIR/overseerr:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.overseerr-rtr.entrypoints=websecure"
+      - "traefik.http.routers.overseerr-rtr.rule=Host(`request.$DOMAINNAME`)"
+      - "traefik.http.routers.overseerr-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.overseerr-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.overseerr-rtr.service=overseerr-svc"
+      - "traefik.http.services.overseerr-svc.loadbalancer.server.port=3579"
+
   tautulli:
     image: linuxserver/tautulli
     container_name: tautulli
@@ -326,56 +333,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
-
-  jackett:
-    image: linuxserver/jackett
-    container_name: jackett
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-       - $DOCKERDIR/jackett:/config
-    labels:
-      - "traefik.enable=true"
-       ## HTTP Routers
-      - "traefik.http.routers.jackett-rtr.entrypoints=websecure"
-      - "traefik.http.routers.jackett-rtr.rule=Host(`jackett.$DOMAINNAME`)"
-       ## Middlewares
-      - "traefik.http.routers.jackett-rtr.middlewares=middlewares-basic-auth@file"
-       ## HTTP Services
-      - "traefik.http.routers.jackett-rtr.service=jackett-svc"
-      - "traefik.http.services.jackett-svc.loadbalancer.server.port=9117"
-
-  hydra2:
-    image: linuxserver/hydra2
-    container_name: hydra2
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-      - $DOCKERDIR/hydra2:/config
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.hydra2-rtr.entrypoints=websecure"
-      - "traefik.http.routers.hydra2-rtr.rule=Host(`hydra2.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.hydra2-rtr.middlewares=middlewares-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
-      - "traefik.http.services.hydra2-svc.loadbalancer.server.port=5076"
 
   airsonic:
     image: ghcr.io/linuxserver/airsonic
@@ -407,3 +364,36 @@ services:
       ## HTTP Services
       - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
       - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+#    ports:
+#      - $NAVIDROME_PORT:4533
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # Optional: put your config options customization here. Examples:
+      - ND_SCANINTERVAL=1m
+      - ND_LOGLEVEL=info
+      - ND_BASEURL=""
+    volumes:
+      - $DOCKERDIR/navidrome:/data"
+      - $MEDIADIR/Audio/Collection:/music"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.navidrome-rtr.entrypoints=websecure"
+      - "traefik.http.routers.navidrome-rtr.rule=Host(`navidrome.$DOMAINNAME`)"
+      - "traefik.http.routers.navidrome-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.navidrome-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
+      - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
