@@ -165,7 +165,8 @@ services:
       - PGID=$PGID
       - TZ=$TZ
     ports:
-      - $HEIMDALL_PORT:4000
+      - $HEIMDALL_PORT_01:80
+      - $HEIMDALL_PORT_02:443
     volumes:
       - $DOCKERDIR/heimdall:/config
 #    labels:
