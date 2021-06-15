@@ -193,7 +193,7 @@ services:
       - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
       - "traefik.http.routers.freshrss-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-no-auth"
+      - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
       - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
