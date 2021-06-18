@@ -291,10 +291,10 @@ services:
       ## Middlewares
       - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.vaultwarden-rtr.service=tautulli-svc"
+      - "traefik.http.routers.vaultwarden-rtr.service=vaultwarden-svc"
       - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
 
-      
+
 ### Media Services ###
 
 
