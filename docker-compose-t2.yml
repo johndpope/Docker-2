@@ -268,7 +268,31 @@ services:
       - "traefik.http.routers.mealie-rtr.service=mealie-svc"
       - "traefik.http.services.mealie-svc.loadbalancer.server.port=80"
 
-
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/vaultwarden:/data
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.vaultwarden-rtr.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden-rtr.rule=Host(`vaultwarden.$DOMAINNAME`)"
+      - "traefik.http.routers.vaultwarden-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.vaultwarden-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.vaultwarden-rtr.service=tautulli-svc"
+      - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
 ### Media Services ###
 
 
@@ -450,7 +474,7 @@ services:
       - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
 
 
-### Home Sustems ###
+### Home Systems ###
 
 
   homeassistant:
