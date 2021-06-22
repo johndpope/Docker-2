@@ -1,0 +1,75 @@
+version: "3.7"
+# Docker Compose for testing new apps before deploying into main stack
+
+########################### NETWORKS
+networks:
+  t2_proxy:
+    external:
+      name: t2_proxy
+  frontend:
+    external:
+      name: frontend
+  backend:
+    internal: true
+  default:
+    driver: bridge
+
+########################### SERVICES
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:13.1
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+    ports:
+      - 5432:5432
+    environment:
+      - TZ=$TZ
+      - APP_PORT=22300
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+    volumes:
+      - $DOCKERDIR/postgres:/var/lib/postgresql/data
+
+  joplin:
+    image: joplin/server:latest
+    container_name: joplin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - postgres
+    networks:
+      - t2_proxy
+      - backend
+#    ports:
+#      - "22300:22300"
+    networks:
+      - t2_proxy
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - APP_BASE_URL=${APP_BASE_URL}
+      - DB_CLIENT=pg
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_HOST=db
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.joplin-rtr.entrypoints=websecure"
+      - "traefik.http.routers.joplin-rtr.rule=Host(`joplin.$DOMAINNAME`)"
+      - "traefik.http.routers.joplin-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.joplin-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.joplin-rtr.service=joplin-svc"
+      - "traefik.http.services.joplin-svc.loadbalancer.server.port=22300"
