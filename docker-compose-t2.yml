@@ -388,25 +388,6 @@ services:
     volumes:
       - $DOCKERDIR/hydra2:/config
 
-  lidarr:
-    image: ghcr.io/linuxserver/lidarr
-    container_name: lidarr
-    restart: unless-stopped
-    networks:
-      - frontend
-    ports:
-      - $LIDARR_PORT:8686
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-      - $DOCKERDIR/lidarr:/config
-      - $MEDIADIR/Audio/Music:/music
-      - $MEDIAGATEDIR/process/Audio/Music:/downloads
-
 
 ### Media Servers ###
 
@@ -492,5 +473,6 @@ services:
       - $DOCKERDIR/homeassistant:/config
 #    devices:
 #      - /path/to/device:/path/to/device
+
 
 ### EOF ###
