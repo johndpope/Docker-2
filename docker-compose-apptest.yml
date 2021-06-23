@@ -14,3 +14,30 @@ networks:
 
 ########################### SERVICES
 services:
+  homer:
+    image: b4bz/homer
+    container_name: homer
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+#    ports:
+#      - 8080:8080
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - /your/local/assets/:/www/assets
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.homer-rtr.entrypoints=websecure"
+      - "traefik.http.routers.homer-rtr.rule=Host(`homer.$DOMAINNAME`)"
+      - "traefik.http.routers.homer-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.homer-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.homer-rtr.service=homer-svc"
+      - "traefik.http.services.homer-svc.loadbalancer.server.port=8080"
