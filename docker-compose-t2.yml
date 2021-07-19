@@ -314,7 +314,7 @@ services:
       - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
 
   joplin:
-    image: joplin/server:latest
+    image: joplin/server:2.1.6-beta
     container_name: joplin
     restart: unless-stopped
     security_opt:
