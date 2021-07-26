@@ -475,7 +475,7 @@ services:
       - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
       - "traefik.http.routers.airsonic-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.airsonic-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
       - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
       - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
@@ -508,7 +508,7 @@ services:
       - "traefik.http.routers.navidrome-rtr.rule=Host(`navidrome.$DOMAINNAME`)"
       - "traefik.http.routers.navidrome-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.navidrome-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
       - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
       - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
