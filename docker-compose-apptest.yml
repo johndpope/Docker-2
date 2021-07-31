@@ -60,4 +60,4 @@ services:
       - UMASK_SET=022
     volumes:
       - $DOCKERDIR/deemix:/config
-  		- $MEDIAGATEDIR/downloaders/deemix:/downloads
+      - $MEDIAGATEDIR/downloaders/deemix:/downloads
