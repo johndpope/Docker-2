@@ -445,6 +445,25 @@ services:
     volumes:
       - $DOCKERDIR/hydra2:/config
 
+  deemix:
+    image: registry.gitlab.com/bockiii/deemix-docker
+    container_name: deemix
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    ports:
+      - 6595:6595
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+    volumes:
+      - $DOCKERDIR/deemix:/config
+      - $MEDIAGATEDIR/downloaders/deemix:/downloads
+
 
 ### Media Servers ###
 
