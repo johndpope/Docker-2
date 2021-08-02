@@ -1,5 +1,5 @@
 version: "3.7"
-# MAIN DOCKER-COMPOSE
+# CLOUD DOCKER-COMPOSE
 
 #####
 # This serves as the docker-compose file for cloud deployment
