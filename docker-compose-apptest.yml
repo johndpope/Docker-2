@@ -19,6 +19,8 @@ networks:
 
 ########################### SERVICES
 services:
+### Testing Services ###
+
   homer:
     image: b4bz/homer
     container_name: homer

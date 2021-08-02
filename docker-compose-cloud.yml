@@ -1,11 +1,23 @@
 version: "3.7"
-# Docker compose file for Digital Ocean Droplets
+# MAIN DOCKER-COMPOSE
 
+#####
+# This serves as the docker-compose file for cloud deployment
+# Any service that needs 100 uptime, or outside connection is deployed
+####
+
+########################### NETWORKS
 networks:
   frontend:
+    external:
+      name: frontend
+  default:
     driver: bridge
 
+########################### SERVICES
 services:
+### Cloud Services ###
+
   nginx-proxy-manager:
     container_name: nginx-proxy-manager
     image: jlesage/nginx-proxy-manager
