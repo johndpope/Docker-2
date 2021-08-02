@@ -43,21 +43,32 @@ services:
       - "traefik.http.services.homer-svc.loadbalancer.server.port=8080"
 
 
-  deemix:
-    image: registry.gitlab.com/bockiii/deemix-docker
-    container_name: deemix
+
+
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red
     restart: unless-stopped
     networks:
       - t2_proxy
-    ports:
-      - 6595:6595
+#    ports:
+#      - $NODERED_PORT:4533
     security_opt:
       - no-new-privileges:true
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-      - UMASK_SET=022
     volumes:
-      - $DOCKERDIR/deemix:/config
-      - $MEDIAGATEDIR/downloaders/deemix:/downloads
+      - $DOCKERDIR/nodered:/data
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.nodered-rtr.entrypoints=websecure"
+      - "traefik.http.routers.nodered-rtr.rule=Host(`nodered.$DOMAINNAME`)"
+      - "traefik.http.routers.nodered-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.nodered-rtr.service=nodered-svc"
+      - "traefik.http.services.nodered-svc.loadbalancer.server.port=1880"
