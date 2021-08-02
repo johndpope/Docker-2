@@ -1,5 +1,10 @@
 version: "3.7"
-# Docker Compose for testing new apps before deploying into main stack
+# MAIN DOCKER-COMPOSE
+
+#####
+# This serves as a testing docker-compose file
+# New services are deployed here before merging into the main compose file
+####
 
 ########################### NETWORKS
 networks:
