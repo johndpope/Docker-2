@@ -441,38 +441,6 @@ services:
 
 ### Media Servers ###
 
-
-  airsonic:
-    image: ghcr.io/linuxserver/airsonic
-    container_name: airsonic
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-#      - CONTEXT_PATH=<URL_BASE> #optional
-#      - JAVA_OPTS=<options> #optional
-    volumes:
-      - $DOCKERDIR/airsonic:/config
-      - $MEDIADIR/Audio/Collection:/music
-      - $MEDIADIR/Audio/Playlists:/playlists
-      - $MEDIADIR/Audio/Podcasts:/podcasts
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.airsonic-rtr.entrypoints=websecure"
-      - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
-      - "traefik.http.routers.airsonic-rtr.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
-      - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
-
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome
