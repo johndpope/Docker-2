@@ -47,8 +47,8 @@ services:
     links:
       - mysql
     volumes:
-      - $PWD/ghost/volumes/config.production.json:/var/lib/ghost/config.production.json:z #overwrite default settings
-      - ./ghost/content:/var/lib/ghost/content:z
+      - $DOCKERDIR/ghost/volumes/config.production.json:/var/lib/ghost/config.production.json:z #overwrite default settings
+      - $DOCKERDIR/ghost/content:/var/lib/ghost/content:z
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
