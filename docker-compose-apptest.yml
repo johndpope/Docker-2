@@ -36,12 +36,11 @@ services:
       - PGID=$PGID
       - TZ=$TZ
     environment:
-      # see https://ghost.org/docs/config/#configuration-options
-       - database__client=mysql
-       - database__connection__host=mysql
-       - database__connection__user=${MYSQL_USER}
-       - database__connection__password=${MYSQL_PASSWORD}
-       - database__connection__database=${MYSQL_DATABASE}
+#       - database__client=mysql
+#       - database__connection__host=mysql
+#       - database__connection__user=${MYSQL_USER}
+#       - database__connection__password=${MYSQL_PASSWORD}
+#       - database__connection__database=${MYSQL_DATABASE}
        - url=http://ghost.whitehome.io
        - NODE_ENV=production
     links:
@@ -61,16 +60,3 @@ services:
       ## HTTP Services
       - "traefik.http.routers.ghost-rtr.service=ghost-svc"
       - "traefik.http.services.ghost-svc.loadbalancer.server.port=2368"
-
-  mysql:
-    container_name: mysql
-    image: mysql:latest
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    ports:
-      - 3306:3306
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-    volumes:
-      - $DOCKERDIR/mysql:/var/lib/mysql:z
