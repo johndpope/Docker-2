@@ -110,7 +110,7 @@ services:
     restart: unless-stopped
     command: -H unix:///var/run/docker.sock
     networks:
-      - t2_proxy
+      - frontend
     ports:
       - "$PORTAINER_PORT:9000"
     security_opt:
@@ -458,7 +458,7 @@ services:
     container_name: deemix
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - frontend
     ports:
       - 6595:6595
     security_opt:
