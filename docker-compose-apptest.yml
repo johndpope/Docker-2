@@ -21,6 +21,43 @@ networks:
 services:
 ### Testing Services ###
 
+
+  ghost:
+    image: docker.io/bitnami/ghost:4
+    container_name: ghost
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+#    ports:
+#      - '80:2368'
+    security_opt:
+     - no-new-privileges:true
+    depends_on:
+      - mariadb
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - ALLOW_EMPTY_PASSWORD=yes
+      - GHOST_DATABASE_HOST=mariadb
+      - GHOST_DATABASE_PORT_NUMBER=3306
+      - GHOST_DATABASE_USER=bn_ghost
+      - GHOST_DATABASE_NAME=bitnami_ghost
+    volumes:
+      - $DOCKERDIR/ghost:/bitnami/ghost
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.ghost-rtr.entrypoints=websecure"
+      - "traefik.http.routers.ghost-rtr.rule=Host(`blog.$DOMAINNAME`)"
+      - "traefik.http.routers.ghost-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.ghost-rtr.middlewares=chain-no-auth@file"
+  #    - "traefik.http.routers.overseerr-rtr.middlewares=middlewares-basic-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.ghost-rtr.service=ghost-svc"
+      - "traefik.http.services.ghost-svc.loadbalancer.server.port=2368"
+
   ghost:
     image: ghost:latest
     container_name: ghost
@@ -62,15 +99,27 @@ services:
       - "traefik.http.services.ghost-svc.loadbalancer.server.port=2368"
 
 
-  mysql:
-    container_name: mysql
-    image: mysql:latest
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-    ports:
-      - 3306:3306
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+
+  mariadb:
+    image: docker.io/bitnami/mariadb:10.3
     volumes:
-      - $DOCKERDIR/mysql:/var/lib/mysql:z
+      - 'mariadb_data:/bitnami/mariadb'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_ghost
+      - MARIADB_DATABASE=bitnami_ghost
+  ghost:
+    image: docker.io/bitnami/ghost:4
+    ports:
+      - '80:2368'
+    volumes:
+      - 'ghost_data:/bitnami/ghost'
+    depends_on:
+      - mariadb
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - GHOST_DATABASE_HOST=mariadb
+      - GHOST_DATABASE_PORT_NUMBER=3306
+      - GHOST_DATABASE_USER=bn_ghost
+      - GHOST_DATABASE_NAME=bitnami_ghost
