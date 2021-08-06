@@ -21,61 +21,59 @@ networks:
 services:
 ### Testing Services ###
 
-  homer:
-    image: b4bz/homer
-    container_name: homer
+  ghost:
+    image: ghost:latest
+    container_name: ghost
     restart: unless-stopped
     networks:
       - t2_proxy
 #    ports:
-#      - 8080:8080
+#      - $GHOST_PORT:2368
     security_opt:
-      - no-new-privileges:true
+     - no-new-privileges:true
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
+    environment:
+      # see https://ghost.org/docs/config/#configuration-options
+       - database__client=mysql
+       - database__connection__host=mysql
+       - database__connection__user=${MYSQL_USER}
+       - database__connection__password=${MYSQL_PASSWORD}
+       - database__connection__database=${MYSQL_DATABASE}
+       - url=http://ghost.whitehome.io
+       - NODE_ENV=production
+    links:
+      - mysql
     volumes:
-      - $DOCKERTESTDIR/homer:/www/assets
+      - $PWD/ghost/volumes/config.production.json:/var/lib/ghost/config.production.json:z #overwrite default settings
+      - ./ghost/content:/var/lib/ghost/content:z
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.homer-rtr.entrypoints=websecure"
-      - "traefik.http.routers.homer-rtr.rule=Host(`homer.$DOMAINNAME`)"
-      - "traefik.http.routers.homer-rtr.tls=true"
+      - "traefik.http.routers.ghost-rtr.entrypoints=websecure"
+      - "traefik.http.routers.ghost-rtr.rule=Host(`ghost.$DOMAINNAME`)"
+      - "traefik.http.routers.ghost-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.homer-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.ghost-rtr.middlewares=chain-no-auth@file"
+  #    - "traefik.http.routers.overseerr-rtr.middlewares=middlewares-basic-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.homer-rtr.service=homer-svc"
-      - "traefik.http.services.homer-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ghost-rtr.service=ghost-svc"
+      - "traefik.http.services.ghost-svc.loadbalancer.server.port=2368"
 
-
-
-
-  node-red:
-    image: nodered/node-red:latest
-    container_name: node-red
-    restart: unless-stopped
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    restart=unless-stopped
     networks:
       - t2_proxy
-#    ports:
-#      - $NODERED_PORT:4533
-    security_opt:
-      - no-new-privileges:true
+    ports:
+      - 3306:3306
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      - MYSQL_ROOT_PASSWORD= ${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD} #please change this
     volumes:
-      - $DOCKERTESTDIR/nodered:/data
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.nodered-rtr.entrypoints=websecure"
-      - "traefik.http.routers.nodered-rtr.rule=Host(`nodered.$DOMAINNAME`)"
-      - "traefik.http.routers.nodered-rtr.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.nodered-rtr.service=nodered-svc"
-      - "traefik.http.services.nodered-svc.loadbalancer.server.port=1880"
+      - $DOCKERDIR/mysql:/var/lib/mysql:z
