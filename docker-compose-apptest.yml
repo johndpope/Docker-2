@@ -52,7 +52,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.ghost-rtr.entrypoints=websecure"
-      - "traefik.http.routers.ghost-rtr.rule=Host(`ghost.$DOMAINNAME`)"
+      - "traefik.http.routers.ghost-rtr.rule=Host(`$DOMAINNAME`)"
       - "traefik.http.routers.ghost-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.ghost-rtr.middlewares=chain-no-auth@file"
