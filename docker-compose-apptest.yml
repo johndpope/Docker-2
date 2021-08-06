@@ -87,25 +87,14 @@ services:
     command: -H unix:///var/run/docker.sock
     networks:
       - t2_proxy
-#    ports:
-#      - "$PORTAINER_PORT:9000"
+    ports:
+      - "$PORTAINER_PORT:9000"
     security_opt:
       - no-new-privileges:true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - $DOCKERDIR/portainer/data:/data
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.portainer-rtr.entrypoints=https"
-      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
-      - "traefik.http.routers.portainer-rtr.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.nodered-rtr.middlewares=chain-no-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $DOCKERDIR/portainer/data:/data
