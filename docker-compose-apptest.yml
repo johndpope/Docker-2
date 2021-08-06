@@ -43,8 +43,8 @@ services:
        - database__connection__database=${MYSQL_DATABASE}
        - url=http://ghost.whitehome.io
        - NODE_ENV=production
-   depends_on:
-     - mysql
+    depends_on:
+       - mysql
     volumes:
 #      - $DOCKERDIR/ghost/volumes/config.production.json:/var/lib/ghost/config.production.json:z #overwrite default settings
       - $DOCKERDIR/ghost/content:/var/lib/ghost/content:z
