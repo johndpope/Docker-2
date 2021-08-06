@@ -39,8 +39,8 @@ services:
       # see https://ghost.org/docs/config/#configuration-options
        - database__client=mysql
        - database__connection__host=mysql
-       - database__connection__user=${MYSQL_USER}
-       - database__connection__password=${MYSQL_PASSWORD}
+       - database__connection__user=root
+       - database__connection__password=${MYSQL_ROOT_PASSWORD}
        - database__connection__database=${MYSQL_DATABASE}
        - url=http://ghost.whitehome.io
        - NODE_ENV=production
