@@ -11,12 +11,14 @@ log_level: warn
 # jwt_secret: SECRET_GOES_HERE # use docker secret file instead AUTHELIA_JWT_SECRET_FILE
 
 # https://docs.authelia.com/configuration/miscellaneous.html#default-redirection-url
-default_redirection_url: https://authelia.example.com
+default_redirection_url: https://authelia.whitehome.io
+
 
 totp:
   issuer: authelia.com
   period: 30
   skew: 1
+
 
 # Enable the following for Duo Push Notification support
 # https://www.authelia.com/docs/features/2fa/push-notifications.html
@@ -25,6 +27,7 @@ totp:
 #  integration_key: ABCDEF
 #  # This secret can also be set using the env variables AUTHELIA_DUO_API_SECRET_KEY_FILE
 #  secret_key: # use docker secret file instead AUTHELIA_DUO_API_SECRET_KEY_FILE
+
 
 authentication_backend:
   file:
@@ -37,12 +40,13 @@ authentication_backend:
       parallelism: 8
       memory: 1024 # blocks this much of the RAM. Tune this.
 
+
 # https://docs.authelia.com/configuration/access-control.html
 access_control:
   default_policy: deny
   rules:
     # Rules applied to everyone
-    - domain: authelia.example.com
+    - domain: authelia.whitehome.io
       policy: bypass
 #    - domain: radarr.example.com
 #      policy: bypass
@@ -51,10 +55,13 @@ access_control:
 #      - "^/api/.*$"
 #    - domain: "*.example.com"
 #      policy: one_factor
-    - domain: "*.example.com"
-      policy: two_factor
-    - domain: "example.com"
-      policy: two_factor
+    - domain:
+        - "*.whitehome.io"
+        - "whitehome.io"
+      policy: bypass
+      networks:
+        - 10.229.10.0/24
+
 
 session:
   name: authelia_session
@@ -63,7 +70,7 @@ session:
   # secret: SECRET_GOES_HERE # use docker secret file instead AUTHELIA_SESSION_SECRET_FILE
   expiration: 3600 # 1 hour
   inactivity: 300 # 5 minutes
-  domain: example.com # Should match whatever your root protected domain is
+  domain: whitehome.io # Should match whatever your root protected domain is
 
 # Optional. Can improve performance on a busy system. If not enabled, session info is stored in memory.
 #  redis:
@@ -77,18 +84,11 @@ regulation:
   find_time: 120
   ban_time: 300
 
+
 storage:
 # For local storage, uncomment lines below and comment out mysql. https://docs.authelia.com/configuration/storage/sqlite.html
-#  local:
-#    path: /config/db.sqlite3
-  mysql:
-  # MySQL allows running multiple authelia instances. Create database and enter details below.
-    host: MYSQL_HOST
-    port: 3306
-    database: authelia
-    username: DBUSERNAME
-    # Password can also be set using a secret: https://docs.authelia.com/configuration/secrets.html
-    # password: use docker secret file instead AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE
+  local:
+    path: /config/db.sqlite3
 
 notifier:
   smtp:

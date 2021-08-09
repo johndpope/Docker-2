@@ -21,105 +21,39 @@ networks:
 services:
 ### Testing Services ###
 
-
-  ghost:
-    image: docker.io/bitnami/ghost:4
-    container_name: ghost
-    restart: unless-stopped
+  authelia:
+    container_name: authelia
+    # image: authelia/authelia:latest
+    image: authelia/authelia:4.21.0
+    restart: always
     networks:
       - t2_proxy
-#    ports:
-#      - '80:2368'
-    security_opt:
-     - no-new-privileges:true
     depends_on:
       - mariadb
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - ALLOW_EMPTY_PASSWORD=yes
-      - GHOST_DATABASE_HOST=mariadb
-      - GHOST_DATABASE_PORT_NUMBER=3306
-      - GHOST_DATABASE_USER=bn_ghost
-      - GHOST_DATABASE_NAME=bitnami_ghost
+      - redis
     volumes:
-      - $DOCKERDIR/ghost:/bitnami/ghost
+      - $DOCKERDIR/authelia:/config
+    environment:
+      - TZ=$TZ
+      - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
+      - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
+    secrets:
+      - authelia_jwt_secret
+      - authelia_session_secret
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.ghost-rtr.entrypoints=websecure"
-      - "traefik.http.routers.ghost-rtr.rule=Host(`blog.$DOMAINNAME`)"
-      - "traefik.http.routers.ghost-rtr.tls=true"
+      - "traefik.http.routers.authelia-rtr.entrypoints=https"
+      - "traefik.http.routers.authelia-rtr.rule=HostHeader(`authelia.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.ghost-rtr.middlewares=chain-no-auth@file"
-  #    - "traefik.http.routers.overseerr-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.ghost-rtr.service=ghost-svc"
-      - "traefik.http.services.ghost-svc.loadbalancer.server.port=2368"
+      - "traefik.http.routers.authelia-rtr.service=authelia-svc"
+      - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
 
-  ghost:
-    image: ghost:latest
-    container_name: ghost
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-#    ports:
-#      - $GHOST_PORT:2368
-    security_opt:
-     - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    environment:
-       - database__client=mysql
-       - database__connection__host=mysql
-       - database__connection__user=${MYSQL_USER}
-       - database__connection__password=${MYSQL_PASSWORD}
-       - database__connection__database=${MYSQL_DATABASE}
-       - url=http://ghost.whitehome.io
-       - NODE_ENV=production
-    depends_on:
-       - mysql
-    volumes:
-#      - $DOCKERDIR/ghost/volumes/config.production.json:/var/lib/ghost/config.production.json:z #overwrite default settings
-      - $DOCKERDIR/ghost/content:/var/lib/ghost/content:z
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.ghost-rtr.entrypoints=websecure"
-      - "traefik.http.routers.ghost-rtr.rule=Host(`blog.$DOMAINNAME`)"
-      - "traefik.http.routers.ghost-rtr.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.ghost-rtr.middlewares=chain-no-auth@file"
-  #    - "traefik.http.routers.overseerr-rtr.middlewares=middlewares-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.ghost-rtr.service=ghost-svc"
-      - "traefik.http.services.ghost-svc.loadbalancer.server.port=2368"
-
-
-
-
-  mariadb:
-    image: docker.io/bitnami/mariadb:10.3
-    volumes:
-      - 'mariadb_data:/bitnami/mariadb'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_USER=bn_ghost
-      - MARIADB_DATABASE=bitnami_ghost
-  ghost:
-    image: docker.io/bitnami/ghost:4
-    ports:
-      - '80:2368'
-    volumes:
-      - 'ghost_data:/bitnami/ghost'
-    depends_on:
-      - mariadb
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - GHOST_DATABASE_HOST=mariadb
-      - GHOST_DATABASE_PORT_NUMBER=3306
-      - GHOST_DATABASE_USER=bn_ghost
-      - GHOST_DATABASE_NAME=bitnami_ghost
+########################### SECRETS
+secrets:
+  authelia_jwt_secret:
+    file: $SECRETSDIR/authelia_jwt_secret
+  authelia_session_secret:
+    file: $SECRETSDIR/authelia_session_secret
