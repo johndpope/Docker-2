@@ -28,9 +28,9 @@ services:
     restart: always
     networks:
       - t2_proxy
-    depends_on:
-      - mariadb
-      - redis
+#    depends_on:
+#      - mariadb
+#      - redis
     volumes:
       - $DOCKERDIR/authelia:/config
     environment:
