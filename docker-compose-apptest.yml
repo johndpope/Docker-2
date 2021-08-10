@@ -53,6 +53,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.authelia-rtr.entrypoints=websecure"
       - "traefik.http.routers.authelia-rtr.rule=Host(`login.$DOMAINNAME`)"
+      - "traefik.http.routers.authelia-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
