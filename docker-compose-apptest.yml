@@ -40,6 +40,7 @@ services:
     secrets:
       - authelia_jwt_secret
       - authelia_session_secret
+      - authelia_notifier_smtp_password
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -57,3 +58,5 @@ secrets:
     file: $SECRETSDIR/authelia_jwt_secret
   authelia_session_secret:
     file: $SECRETSDIR/authelia_session_secret
+  authelia_notifier_smtp_password:
+    file: $SECRETSDIR/authelia_notifier_smtp_password
