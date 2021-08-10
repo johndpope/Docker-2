@@ -47,9 +47,6 @@ services:
       - authelia_notifier_smtp_password
     labels:
       - "traefik.enable=true"
-      - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://login.example.com/'
-      - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
-      - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups'
       ## HTTP Routers
       - "traefik.http.routers.authelia-rtr.entrypoints=websecure"
       - "traefik.http.routers.authelia-rtr.rule=Host(`login.$DOMAINNAME`)"
