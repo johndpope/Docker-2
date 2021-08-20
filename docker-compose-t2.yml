@@ -23,7 +23,7 @@ services:
 
   traefik:
     container_name: traefik
-    image: traefik:2.2.1 # the chevrotin tag refers to v2.2.x but introduced a breaking change in 2.2.2
+    image: traefik:2.5.0 # the chevrotin tag refers to v2.2.x but introduced a breaking change in 2.2.2
     restart: unless-stopped
     command: # CLI arguments
       - --global.checkNewVersion=true
