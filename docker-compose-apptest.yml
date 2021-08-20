@@ -21,80 +21,21 @@ networks:
 services:
 ### Testing Services ###
 
-  authelia:
-    container_name: authelia
-    image: authelia/authelia:latest
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-      - default
-      - frontend
-#    ports:
-#      - "9091:9091"
-#    depends_on:
-#      - mariadb
-#      - redis
+  firefly:
+    image: fireflyiii/core:latest
     volumes:
-      - $DOCKERDIR/authelia:/config
+      - $DOCKERDIR/firefly:/var/www/html/storage/upload
+    ports:
+      - 80:8080
+    depends_on:
+      - mariadb-ff
+      
+  mariadb-ff:
+    image: mariadb
     environment:
-      - TZ=$TZ
-      - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
-      - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
-      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/run/secrets/authelia_notifier_smtp_password
-    secrets:
-      - authelia_jwt_secret
-      - authelia_session_secret
-      - authelia_notifier_smtp_password
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.authelia-rtr.entrypoints=websecure"
-      - "traefik.http.routers.authelia-rtr.rule=HostHeader(`login.$DOMAINNAME`)"      
-      - "traefik.http.routers.authelia-rtr.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.authelia-rtr.service=authelia-svc"
-      - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
-
-  wikijs:
-    image: linuxserver/wikijs
-    container_name: wikijs
-    restart: unless-stopped
-    networks:
-      - t2_proxy
-#    ports:
-#      - $WIKIJS_PORT:3000
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER=firefly
+      - MYSQL_PASSWORD=secret_firefly_password
+      - MYSQL_DATABASE=firefly
     volumes:
-      - $DOCKERDIR/wikijs:/config
-      - $DOCKERDIR/wikijs/data:/data
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.wikijs-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wikijs-rtr.rule=HostHeader(`wiki.$DOMAINNAME`)"
-      - "traefik.http.routers.wikijs-rtr.tls=true"
-      ## Middlewares
-#      - "traefik.http.routers.wikijs-rtr.middlewares=chain-no-auth@file"
-#      - "traefik.http.routers.wikijs-rtr.middlewares=middlewares-basic-auth@file"
-      - "traefik.http.routers.wikijs-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.wikijs-rtr.service=wikijs-svc"
-      - "traefik.http.services.wikijs-svc.loadbalancer.server.port=3000"
-
-
-
-########################### SECRETS
-secrets:
-  authelia_jwt_secret:
-    file: $SECRETSDIR/authelia_jwt_secret
-  authelia_session_secret:
-    file: $SECRETSDIR/authelia_session_secret
-  authelia_notifier_smtp_password:
-    file: $SECRETSDIR/authelia_notifier_smtp_password
+      - $DOCKERDIR/mariadb-ffiii:/var/lib/mysql
