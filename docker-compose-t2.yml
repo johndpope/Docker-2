@@ -247,7 +247,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.freshrss-rtr.entrypoints=websecure"
-      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+      - "traefik.http.routers.freshrss-rtr.rule=HostHeader(`freshrss.$DOMAINNAME`)"
       - "traefik.http.routers.freshrss-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.freshrss-rtr.middlewares=chain-no-auth@file"
@@ -307,7 +307,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.vaultwarden-rtr.entrypoints=websecure"
-      - "traefik.http.routers.vaultwarden-rtr.rule=Host(`vaultwarden.$DOMAINNAME`)"
+      - "traefik.http.routers.vaultwarden-rtr.rule=HostHeader(`vaultwarden.$DOMAINNAME`)"
       - "traefik.http.routers.vaultwarden-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-no-auth@file"
@@ -344,7 +344,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.joplin-rtr.entrypoints=websecure"
-      - "traefik.http.routers.joplin-rtr.rule=Host(`joplin.$DOMAINNAME`)"
+      - "traefik.http.routers.joplin-rtr.rule=HostHeader(`joplin.$DOMAINNAME`)"
       - "traefik.http.routers.joplin-rtr.tls=true"
       ## Middlewares
       - "traefik.http.routers.joplin-rtr.middlewares=chain-no-auth@file"
@@ -408,7 +408,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.tautulli-rtr.entrypoints=websecure"
-      - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME`)"
+      - "traefik.http.routers.tautulli-rtr.rule=HostHeader(`tautulli.$DOMAINNAME`)"
       - "traefik.http.routers.tautulli-rtr.tls=true"
       ## Middlewares
 #      - "traefik.http.routers.tautulli-rtr.middlewares=chain-no-auth@file"
@@ -500,7 +500,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.navidrome-rtr.entrypoints=websecure"
-      - "traefik.http.routers.navidrome-rtr.rule=Host(`navidrome.$DOMAINNAME`)"
+      - "traefik.http.routers.navidrome-rtr.rule=HostHeader(`navidrome.$DOMAINNAME`)"
       - "traefik.http.routers.navidrome-rtr.tls=true"
       ## Middlewares
 #      - "traefik.http.routers.navidrome-rtr.middlewares=chain-no-auth@file"
