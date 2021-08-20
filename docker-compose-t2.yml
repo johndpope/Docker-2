@@ -27,8 +27,7 @@ services:
     restart: unless-stopped
     command:
       - --global.checkNewVersion=true
-      - --global.sendAnonymousUsage=true ###
-      - --global.insecureSNI=true
+      - --global.sendAnonymousUsage=true
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
       - --entrypoints.web.address=:80
