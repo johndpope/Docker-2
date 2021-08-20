@@ -77,7 +77,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.wikijs-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wikijs-rtr.rule=Host(`wiki.$DOMAINNAME`)"
+      - "traefik.http.routers.wikijs-rtr.rule=HostHeader(`wiki.$DOMAINNAME`)"
       - "traefik.http.routers.wikijs-rtr.tls=true"
       ## Middlewares
 #      - "traefik.http.routers.wikijs-rtr.middlewares=chain-no-auth@file"
