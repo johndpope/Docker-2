@@ -6,21 +6,10 @@ version: "3.7"
 # Serves all of the services used by home, friends and family
 ####
 
-########################### NETWORKS
-networks:
-  t2_proxy:
-    external:
-      name: t2_proxy
-  frontend:
-    external:
-      name: frontend
-  default:
-    driver: bridge
-
 ########################### SERVICES
 services:
-### Backend Services ###
 
+### Backend Services ###
   traefik:
     image: traefik:2.5.0
     container_name: traefik
@@ -90,15 +79,17 @@ services:
       - "traefik.enable=true"
       # HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=websecure"
-      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
+      - "traefik.http.routers.traefik-rtr.rule=HostHeader(`traefik.$DOMAINNAME`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
 #      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       - "traefik.http.routers.traefik-rtr.tls.domains[0].main=$DOMAINNAME"
       - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.$DOMAINNAME"
+      ## Middlewares
+#      - "traefik.http.routers.traefik-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file"
       ## Services - API
       - "traefik.http.routers.traefik-rtr.service=api@internal"
-      ## Middlewares
-      - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
 
   authelia:
     image: authelia/authelia:latest
@@ -131,6 +122,8 @@ services:
       - "traefik.http.routers.authelia-rtr.rule=HostHeader(`login.$DOMAINNAME`)"
       - "traefik.http.routers.authelia-rtr.tls=true"
       ## Middlewares
+#      - "traefik.http.routers.authelia-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.authelia-rtr.middlewares=middlewares-basic-auth@file"
       - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.authelia-rtr.service=authelia-svc"
@@ -143,8 +136,8 @@ services:
     command: -H unix:///var/run/docker.sock
     networks:
       - frontend
-    ports:
-      - "$PORTAINER_PORT:9000"
+#    ports:
+#      - "$PORTAINER_PORT:9000"
     security_opt:
       - no-new-privileges:true
     environment:
@@ -154,6 +147,19 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKERDIR/portainer/data:/data
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
+      - "traefik.http.routers.portainer-rtr.rule=HostHeader(`portainer.$DOMAINNAME`)"
+      - "traefik.http.routers.portainer-rtr.tls=true"
+      ## Middlewares
+#      - "traefik.http.routers.portainer-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.portainer-rtr.service=authelia-svc"
+      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
 
   postgres:
     image: postgres:13.1
@@ -176,9 +182,7 @@ services:
     volumes:
       - $DOCKERDIR/postgres:/var/lib/postgresql/data
 
-
 ### Web Fronts ###
-
 
   organizr:
     image: organizr/organizr
@@ -228,9 +232,7 @@ services:
     volumes:
       - $DOCKERDIR/heimdall:/config
 
-
 ### Web Services ###
-
 
   freshrss:
     image: linuxserver/freshrss
@@ -332,7 +334,6 @@ services:
       - postgres
     networks:
       - t2_proxy
-#      - backend
 #    ports:
 #      - "$JOPLIN_PORT:22300"
     security_opt:
@@ -364,9 +365,7 @@ services:
       - "traefik.http.routers.joplin-rtr.service=joplin-svc"
       - "traefik.http.services.joplin-svc.loadbalancer.server.port=22300"
 
-
 ### Media Services ###
-
 
   overseerr:
     image: ghcr.io/linuxserver/overseerr
@@ -482,9 +481,7 @@ services:
       - $DOCKERDIR/deemix:/config
       - $MEDIAGATEDIR/downloaders/deemix:/downloads
 
-
 ### Media Servers ###
-
 
   navidrome:
     image: deluan/navidrome:latest
@@ -539,6 +536,19 @@ services:
 #    devices:
 #      - /path/to/device:/path/to/device
 
+
+
+########################### NETWORKS
+networks:
+  t2_proxy:
+    external:
+      name: t2_proxy
+  frontend:
+    external:
+      name: frontend
+  default:
+    driver: bridge
+
 ########################### SECRETS
 secrets:
   authelia_jwt_secret:
@@ -555,4 +565,5 @@ secrets:
     file: $SECRETSDIR/http_password
   postgres_password:
     file: $SECRETSDIR/postgres_password
+
 ### EOF ###
