@@ -343,7 +343,7 @@ services:
       - TZ=$TZ
       - APP_BASE_URL=${JOPLIN_APP_BASE_URL}
       - DB_CLIENT=pg
-      - POSTGRES_PASSWORD=/run/secrets/postgres_password
+      - POSTGRES_PASSWORD="^8NVswAta6TFz3N3zTE^8&FS"
       - POSTGRES_DATABASE=${POSTGRES_DATABASE}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PORT=${POSTGRES_PORT}
