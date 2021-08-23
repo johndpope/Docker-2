@@ -158,7 +158,7 @@ services:
 #      - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
       - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.portainer-rtr.service=authelia-svc"
+      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
       - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
 
   postgres:
@@ -317,7 +317,6 @@ services:
       - "traefik.http.routers.vaultwarden-rtr.entrypoints=websecure"
       - "traefik.http.routers.vaultwarden-rtr.rule=Host(`vaultwarden.$DOMAINNAME`)"
       - "traefik.http.routers.vaultwarden-rtr.tls=true"
-      ## Middlewares
       ## Middlewares
       - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-no-auth@file"
 #      - "traefik.http.routers.vaultwarden-rtr.middlewares=middlewares-basic-auth@file"
