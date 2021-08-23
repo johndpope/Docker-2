@@ -315,7 +315,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.vaultwarden-rtr.entrypoints=websecure"
-      - "traefik.http.routers.vaultwarden-rtr.rule=HostHeader(`vaultwarden.$DOMAINNAME`)"
+      - "traefik.http.routers.vaultwarden-rtr.rule=Host(`vaultwarden.$DOMAINNAME`)"
       - "traefik.http.routers.vaultwarden-rtr.tls=true"
       ## Middlewares
       ## Middlewares
