@@ -136,8 +136,8 @@ services:
     command: -H unix:///var/run/docker.sock
     networks:
       - frontend
-#    ports:
-#      - "$PORTAINER_PORT:9000"
+    ports:
+      - "$PORTAINER_PORT:9000"
     security_opt:
       - no-new-privileges:true
     environment:
@@ -147,19 +147,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKERDIR/portainer/data:/data
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
-      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
-      - "traefik.http.routers.portainer-rtr.tls=true"
-      ## Middlewares
-#      - "traefik.http.routers.portainer-rtr.middlewares=chain-no-auth@file"
-#      - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
-      - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
 
   postgres:
     image: postgres:13.1
