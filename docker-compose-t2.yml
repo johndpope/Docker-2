@@ -163,7 +163,7 @@ services:
       - APP_PORT=22300
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DATABASE}
-      - POSTGRES_PASSWORD="^8NVswAta6TFz3N3zTE^8&FS"
+      - POSTGRES_PASSWORD=/run/secrets/postgres_password
     secrets:
       - postgres_password
     volumes:
