@@ -310,7 +310,7 @@ services:
 #      - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.vaultwarden-rtr.service=vaultwarden-svc"
-      - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=5055"
+      - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
 
   joplin:
     image: joplin/server:2.1.6-beta
