@@ -151,7 +151,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
-      - "traefik.http.routers.portainer-rtr.rule=HostHeader(`portainer.$DOMAINNAME`)"
+      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
       - "traefik.http.routers.portainer-rtr.tls=true"
       ## Middlewares
 #      - "traefik.http.routers.portainer-rtr.middlewares=chain-no-auth@file"
