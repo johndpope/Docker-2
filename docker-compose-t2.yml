@@ -1,19 +1,20 @@
 version: "3.7"
 # MAIN DOCKER-COMPOSE
 
-########################### NETWORKS
-networks:
-  t2_proxy:
-    external:
-      name: t2_proxy
-  default:
-    driver: bridge
+
+####
+# This serves as the main docker-compose file ran on premise
+# Serves all of the services used by home, friends and family
+####
+
+
+#### SERVICES
 
 services:
-# Traefik 2 - Reverse Proxy
+## Backend Services
   traefik:
+    image: traefik:2.5.0
     container_name: traefik
-    image: traefik:2.2.1 # the chevrotin tag refers to v2.2.x but introduced a breaking change in 2.2.2
     restart: unless-stopped
     command: # CLI arguments
       - --global.checkNewVersion=true
@@ -24,8 +25,6 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.websecure.address=:443
-        # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
-#      - --entrypoints.https.forwardedHeaders.trustedIPs=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/12,172.64.0.0/13,131.0.72.0/22
       - --entryPoints.traefik.address=:8080
       - --api=true
 #      - --api.insecure=true
@@ -46,13 +45,11 @@ services:
 #      - --providers.file.filename=/path/to/file # Load dynamic configuration from a file.
       - --providers.file.watch=true # Only works on top level files in the rules folder
 #      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
-      - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
+      - --certificatesResolvers.dns-cloudflare.acme.email=/run/secrets/cloudflare_email
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
     networks:
       - t2_proxy
-    security_opt:
-      - no-new-privileges:true
     ports:
       - target: 80
         published: 80
@@ -66,81 +63,115 @@ services:
         published: 8080
         protocol: tcp
         mode: host
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - CF_API_EMAIL=/run/secrets/cloudflare_email
+      - CF_API_KEY=/run/secrets/cloudflare_api_key
+    secrets:
+      - cloudflare_api_key
+      - cloudflare_email
     volumes:
       - $DOCKERDIR/shared/rules:/rules
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKERDIR/traefik2/acme/acme.json:/acme.json
       - $DOCKERDIR/traefik2/traefik.log:/traefik.log
       - $DOCKERDIR/shared:/shared
-    environment:
-      - CF_API_EMAIL=$CLOUDFLARE_EMAIL
-      - CF_API_KEY=$CLOUDFLARE_API_KEY
     labels:
       - "traefik.enable=true"
-      # HTTP-to-HTTPS Redirect
-      # - "traefik.http.routers.http-catchall.entrypoints=http"
-      # - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
-      # - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=websecure"
-      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
+      - "traefik.http.routers.traefik-rtr.rule=HostHeader(`traefik.$DOMAINNAME`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
 #      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       - "traefik.http.routers.traefik-rtr.tls.domains[0].main=$DOMAINNAME"
       - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.$DOMAINNAME"
+      ## Middlewares
+#      - "traefik.http.routers.traefik-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file"
       ## Services - API
       - "traefik.http.routers.traefik-rtr.service=api@internal"
-      ## Middlewares
-      - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file"
 
-  portainer:
-    container_name: portainer
-    image: portainer/portainer-ce:latest
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
     restart: unless-stopped
-    command: -H unix:///var/run/docker.sock
     networks:
       - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
-      - $DOCKERDIR/portainer:/data # Change to local directory if you want to save/transfer config locally
+      - default
+      - frontend
+#    ports:
+#      - $AUTHELIA_PORT:9091
+#    depends_on:
+#      - mariadb
+#      - redis
     environment:
       - TZ=$TZ
+      - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
+      - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
+      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/run/secrets/authelia_notifier_smtp_password
+    secrets:
+      - authelia_jwt_secret
+      - authelia_session_secret
+      - authelia_notifier_smtp_password
+    volumes:
+      - $DOCKERDIR/authelia:/config
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
-      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
-      - "traefik.http.routers.portainer-rtr.tls=true"
+      - "traefik.http.routers.authelia-rtr.entrypoints=websecure"
+      - "traefik.http.routers.authelia-rtr.rule=HostHeader(`login.$DOMAINNAME`)"
+      - "traefik.http.routers.authelia-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.portainer-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.authelia-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.authelia-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+      - "traefik.http.routers.authelia-rtr.service=authelia-svc"
+      - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
 
-  wireguard:
-    container_name: wireguard
-    image: ghcr.io/linuxserver/wireguard
+  portainer:
+    image: portainer/portainer:latest
+    container_name: portainer
     restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
     networks:
-      - default
+      - frontend
+    ports:
+      - "$PORTAINER_PORT:9000"
     security_opt:
       - no-new-privileges:true
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-      - SERVERURL=wireguard.whitehome.io #optional
-      - SERVERPORT=51820 #optional
-      - PEERS=4 #optional
-      - PEERDNS=auto #optional
-      - INTERNAL_SUBNET=10.229.180.0 #optional
-      - ALLOWEDIPS=0.0.0.0/0 #optional
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $DOCKERDIR/portainer/data:/data
+
+  postgres:
+    image: postgres:13.1
+    container_name: postgres
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+    ports:
+      - 5432:5432
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=$TZ
+      - APP_PORT=22300
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+      - POSTGRES_PASSWORD=/run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - $DOCKERDIR/postgres:/var/lib/postgresql/data
+
+## Web Fronts
 
   organizr:
     image: organizr/organizr
@@ -148,6 +179,8 @@ services:
     restart: unless-stopped
     networks:
       - t2_proxy
+#    ports:
+#      - $ORGANIZR_PORT:80
     security_opt:
       - no-new-privileges:true
     environment:
@@ -160,20 +193,25 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.organizr-rtr.entrypoints=websecure"
-      - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
+      - "traefik.http.routers.organizr-rtr.rule=HostHeader(`organizr.$DOMAINNAME`)"
       - "traefik.http.routers.organizr-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.organizr-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.organizr-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.organizr-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.organizr-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.organizr-rtr.service=organizr-svc"
       - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
 
   heimdall:
-    container_name: heimdall
     image: linuxserver/heimdall:latest
+    container_name: heimdall
     restart: unless-stopped
     networks:
       - t2_proxy
+    ports:
+      - $HEIMDALL_PORT_01:80
+      - $HEIMDALL_PORT_02:443
     security_opt:
       - no-new-privileges:true
     environment:
@@ -182,17 +220,8 @@ services:
       - TZ=$TZ
     volumes:
       - $DOCKERDIR/heimdall:/config
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.heimdall-rtr.entrypoints=websecure"
-      - "traefik.http.routers.heimdall-rtr.rule=Host(`launch.$DOMAINNAME`)"
-      - "traefik.http.routers.heimdall-rtr.tls=true"
-      ## Middlewares
-      - "traefik.http.routers.heimdall-rtr.middlewares=middlewares-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.heimdall-rtr.service=heimdall-svc"
-      - "traefik.http.services.heimdall-svc.loadbalancer.server.port=80"
+
+## Web Services
 
   freshrss:
     image: linuxserver/freshrss
@@ -200,6 +229,8 @@ services:
     restart: unless-stopped
     networks:
       - t2_proxy
+#    ports:
+#      - $FRESHRSS_PORT:80
     security_opt:
      - no-new-privileges:true
     environment:
@@ -211,11 +242,13 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.fressrss-rtr.entrypoints=websecure"
-      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+      - "traefik.http.routers.freshrss-rtr.entrypoints=websecure"
+      - "traefik.http.routers.freshrss-rtr.rule=HostHeader(`freshrss.$DOMAINNAME`)"
       - "traefik.http.routers.freshrss-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.freshrss-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.freshrss-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
       - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
@@ -226,6 +259,8 @@ services:
     restart: unless-stopped
     networks:
       - t2_proxy
+#    ports:
+#      - $WIKIJS_PORT:3000
     security_opt:
       - no-new-privileges:true
     environment:
@@ -239,47 +274,95 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.wikijs-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wikijs-rtr.rule=Host(`wikijs.$DOMAINNAME`)"
+      - "traefik.http.routers.wikijs-rtr.rule=HostHeader(`wiki.$DOMAINNAME`)"
       - "traefik.http.routers.wikijs-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.wikijs-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.wikijs-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.wikijs-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.wikijs-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.wikijs-rtr.service=wikijs-svc"
       - "traefik.http.services.wikijs-svc.loadbalancer.server.port=3000"
 
-  mealie:
-    image: hkotel/mealie
-    container_name: mealie
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
     restart: unless-stopped
     networks:
       - t2_proxy
+#    ports:
+#      - $VAULTWARDEN_PORT:80
     security_opt:
       - no-new-privileges:true
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-      - db_type=sqlite
     volumes:
-      - $DOCKERDIR/mealie/data/:/app/data
+      - $DOCKERDIR/vaultwarden:/data
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.mealie-rtr.entrypoints=websecure"
-      - "traefik.http.routers.mealie-rtr.rule=Host(`recipe.$DOMAINNAME`)"
-      - "traefik.http.routers.mealie-rtr.tls=true"
+      - "traefik.http.routers.vaultwarden-rtr.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden-rtr.rule=Host(`vaultwarden.$DOMAINNAME`)"
+      - "traefik.http.routers.vaultwarden-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.mealie-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.vaultwarden-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.mealie-rtr.service=mealie-svc"
-      - "traefik.http.services.mealie-svc.loadbalancer.server.port=80"
+      - "traefik.http.routers.vaultwarden-rtr.service=vaultwarden-svc"
+      - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
 
-  ombi:
-    image: ghcr.io/linuxserver/ombi
-    container_name: ombi
+  joplin:
+    image: joplin/server:2.1.6-beta
+    container_name: joplin
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - t2_proxy
+#    ports:
+#      - "$JOPLIN_PORT:22300"
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - APP_BASE_URL=${JOPLIN_APP_BASE_URL}
+      - DB_CLIENT=pg
+      - POSTGRES_PASSWORD=/run/secrets/postgres_password
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_HOST=postgres
+    secrets:
+      - postgres_password
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.joplin-rtr.entrypoints=websecure"
+      - "traefik.http.routers.joplin-rtr.rule=HostHeader(`joplin.$DOMAINNAME`)"
+      - "traefik.http.routers.joplin-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.joplin-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.joplin-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.joplin-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.joplin-rtr.service=joplin-svc"
+      - "traefik.http.services.joplin-svc.loadbalancer.server.port=22300"
+
+## Media Services
+
+  overseerr:
+    image: ghcr.io/linuxserver/overseerr
+    container_name: overseerr
     restart: unless-stopped
     networks:
       - t2_proxy
+#    ports:
+#      - $OVERSEERR_PORT:5055
     security_opt:
       - no-new-privileges:true
     environment:
@@ -287,18 +370,20 @@ services:
       - PGID=$PGID
       - TZ=$TZ
     volumes:
-      - $DOCKERDIR/ombi/config:/config
+      - $DOCKERDIR/overseerr:/config
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.ombi-rtr.entrypoints=websecure"
-      - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
-      - "traefik.http.routers.ombi-rtr.tls=true"
+      - "traefik.http.routers.overseerr-rtr.entrypoints=websecure"
+      - "traefik.http.routers.overseerr-rtr.rule=HostHeader(`request.$DOMAINNAME`)"
+      - "traefik.http.routers.overseerr-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.ombi-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.overseerr-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.overseerr-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.overseerr-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.ombi-rtr.service=ombi-svc"
-      - "traefik.http.services.ombi-svc.loadbalancer.server.port=3579"
+      - "traefik.http.routers.overseerr-rtr.service=overseerr-svc"
+      - "traefik.http.services.overseerr-svc.loadbalancer.server.port=5055"
 
   tautulli:
     image: linuxserver/tautulli
@@ -306,6 +391,8 @@ services:
     restart: unless-stopped
     networks:
       - t2_proxy
+#    ports:
+#      - $TAUTULLI_PORT:8181
     security_opt:
       - no-new-privileges:true
     environment:
@@ -319,10 +406,12 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.tautulli-rtr.entrypoints=websecure"
-      - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME`)"
+      - "traefik.http.routers.tautulli-rtr.rule=HostHeader(`tautulli.$DOMAINNAME`)"
       - "traefik.http.routers.tautulli-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.tautulli-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.tautulli-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.tautulli-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
@@ -332,7 +421,9 @@ services:
     container_name: jackett
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - frontend
+    ports:
+      - $JACKETT_PORT:9117
     security_opt:
       - no-new-privileges:true
     environment:
@@ -341,23 +432,15 @@ services:
       - TZ=$TZ
     volumes:
        - $DOCKERDIR/jackett:/config
-    labels:
-      - "traefik.enable=true"
-       ## HTTP Routers
-      - "traefik.http.routers.jackett-rtr.entrypoints=websecure"
-      - "traefik.http.routers.jackett-rtr.rule=Host(`jackett.$DOMAINNAME`)"
-       ## Middlewares
-      - "traefik.http.routers.jackett-rtr.middlewares=middlewares-basic-auth@file"
-       ## HTTP Services
-      - "traefik.http.routers.jackett-rtr.service=jackett-svc"
-      - "traefik.http.services.jackett-svc.loadbalancer.server.port=9117"
 
   hydra2:
     image: linuxserver/hydra2
     container_name: hydra2
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - frontend
+    ports:
+      - $HYDRA2_PORT:5076
     security_opt:
       - no-new-privileges:true
     environment:
@@ -366,44 +449,110 @@ services:
       - TZ=$TZ
     volumes:
       - $DOCKERDIR/hydra2:/config
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.hydra2-rtr.entrypoints=websecure"
-      - "traefik.http.routers.hydra2-rtr.rule=Host(`hydra2.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.hydra2-rtr.middlewares=middlewares-basic-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.hydra2-rtr.service=hydra2-svc"
-      - "traefik.http.services.hydra2-svc.loadbalancer.server.port=5076"
 
-  airsonic:
-    image: ghcr.io/linuxserver/airsonic
-    container_name: airsonic
+  deemix:
+    image: registry.gitlab.com/bockiii/deemix-docker
+    container_name: deemix
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - frontend
+    ports:
+      - $DEEMIX_PORT:6595
     security_opt:
       - no-new-privileges:true
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-#      - CONTEXT_PATH=<URL_BASE> #optional
-#      - JAVA_OPTS=<options> #optional
+      - UMASK_SET=022
     volumes:
-      - $DOCKERDIR/airsonic:/config
-      - $MEDIADIR/Audio/Collection:/music
-      - $MEDIADIR/Audio/Playlists:/playlists
-      - $MEDIADIR/Audio/Podcasts:/podcasts
+      - $DOCKERDIR/deemix:/config
+      - $MEDIAGATEDIR/downloaders/deemix:/downloads
+
+## Media Servers
+
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+#    ports:
+#      - $NAVIDROME_PORT:4533
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # Optional: put your config options customization here. Examples:
+      - ND_SCANINTERVAL=1m
+      - ND_LOGLEVEL=info
+      - ND_BASEURL=""
+    volumes:
+      - $DOCKERDIR/navidrome:/data"
+      - $MEDIADIR/Audio/Collection:/music"
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.airsonic-rtr.entrypoints=websecure"
-      - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
-      - "traefik.http.routers.airsonic-rtr.tls=true"
+      - "traefik.http.routers.navidrome-rtr.entrypoints=websecure"
+      - "traefik.http.routers.navidrome-rtr.rule=HostHeader(`navidrome.$DOMAINNAME`)"
+      - "traefik.http.routers.navidrome-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.airsonic-rtr.middlewares=middlewares-basic-auth@file"
+#      - "traefik.http.routers.navidrome-rtr.middlewares=chain-no-auth@file"
+#      - "traefik.http.routers.navidrome-rtr.middlewares=middlewares-basic-auth@file"
+      - "traefik.http.routers.navidrome-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
-      - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+      - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
+      - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
+
+## Home Systems
+
+  homeassistant:
+    image: ghcr.io/linuxserver/homeassistant
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/homeassistant:/config
+#    devices:
+#      - /path/to/device:/path/to/device
+
+
+#### NETWORKS
+
+networks:
+  t2_proxy:
+    external:
+      name: t2_proxy
+  frontend:
+    external:
+      name: frontend
+  default:
+    driver: bridge
+
+
+#### SECRETS
+
+secrets:
+  authelia_jwt_secret:
+    file: $SECRETSDIR/authelia_jwt_secret
+  authelia_session_secret:
+    file: $SECRETSDIR/authelia_session_secret
+  authelia_notifier_smtp_password:
+    file: $SECRETSDIR/authelia_notifier_smtp_password
+  cloudflare_api_key:
+    file: $SECRETSDIR/cloudflare_api_key
+  cloudflare_email:
+    file: $SECRETSDIR/cloudflare_email
+  http_password:
+    file: $SECRETSDIR/http_password
+  postgres_password:
+    file: $SECRETSDIR/postgres_password
+
+
+#### EOF ####
