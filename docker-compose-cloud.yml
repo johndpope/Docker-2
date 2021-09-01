@@ -1,22 +1,16 @@
 version: "3.7"
 # CLOUD DOCKER-COMPOSE
 
-#####
+
+####
 # This serves as the docker-compose file for cloud deployment
 # Any service that needs 100 uptime, or outside connection is deployed
 ####
 
-########################### NETWORKS
-networks:
-  frontend:
-    external:
-      name: frontend
-  default:
-    driver: bridge
 
-########################### SERVICES
+##### SERVICES
+
 services:
-### Cloud Services ###
 
   nginx-proxy-manager:
     container_name: nginx-proxy-manager
@@ -32,3 +26,13 @@ services:
       - 443:443
     volumes:
       - $DOCKERDIR/nginx-proxy-manager:/config:rw
+
+
+#### NETWORKS
+
+networks:
+  frontend:
+    external:
+      name: frontend
+  default:
+    driver: bridge
