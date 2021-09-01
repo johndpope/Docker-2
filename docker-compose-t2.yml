@@ -1,15 +1,17 @@
 version: "3.7"
 # MAIN DOCKER-COMPOSE
 
+
 #####
 # This serves as the main docker-compose file ran on premise
 # Serves all of the services used by home, friends and family
 ####
 
-########################### SERVICES
-services:
 
-### Backend Services ###
+##### SERVICES
+
+services:
+## Backend Services
   traefik:
     image: traefik:2.5.0
     container_name: traefik
@@ -169,7 +171,7 @@ services:
     volumes:
       - $DOCKERDIR/postgres:/var/lib/postgresql/data
 
-### Web Fronts ###
+## Web Fronts
 
   organizr:
     image: organizr/organizr
@@ -219,7 +221,7 @@ services:
     volumes:
       - $DOCKERDIR/heimdall:/config
 
-### Web Services ###
+## Web Services
 
   freshrss:
     image: linuxserver/freshrss
@@ -351,7 +353,7 @@ services:
       - "traefik.http.routers.joplin-rtr.service=joplin-svc"
       - "traefik.http.services.joplin-svc.loadbalancer.server.port=22300"
 
-### Media Services ###
+## Media Services
 
   overseerr:
     image: ghcr.io/linuxserver/overseerr
@@ -467,7 +469,7 @@ services:
       - $DOCKERDIR/deemix:/config
       - $MEDIAGATEDIR/downloaders/deemix:/downloads
 
-### Media Servers ###
+## Media Servers
 
   navidrome:
     image: deluan/navidrome:latest
@@ -504,9 +506,7 @@ services:
       - "traefik.http.routers.navidrome-rtr.service=navidrome-svc"
       - "traefik.http.services.navidrome-svc.loadbalancer.server.port=4533"
 
-
-### Home Systems ###
-
+## Home Systems
 
   homeassistant:
     image: ghcr.io/linuxserver/homeassistant
@@ -523,8 +523,8 @@ services:
 #      - /path/to/device:/path/to/device
 
 
+#### NETWORKS
 
-########################### NETWORKS
 networks:
   t2_proxy:
     external:
@@ -535,7 +535,9 @@ networks:
   default:
     driver: bridge
 
-########################### SECRETS
+
+#### SECRETS
+
 secrets:
   authelia_jwt_secret:
     file: $SECRETSDIR/authelia_jwt_secret
@@ -552,4 +554,5 @@ secrets:
   postgres_password:
     file: $SECRETSDIR/postgres_password
 
-### EOF ###
+
+#### EOF ####
