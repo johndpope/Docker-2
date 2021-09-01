@@ -2,13 +2,13 @@ version: "3.7"
 # MAIN DOCKER-COMPOSE
 
 
-#####
+####
 # This serves as the main docker-compose file ran on premise
 # Serves all of the services used by home, friends and family
 ####
 
 
-##### SERVICES
+#### SERVICES
 
 services:
 ## Backend Services
