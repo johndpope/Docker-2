@@ -6,17 +6,15 @@
 
 ## What apps are included in this stack?
 
-The apps I use are scattered around in five different docker-compose files (on five hosts listed above). Some apps are used in more than one host and some on only one.
+The apps I use serve as a way to get control of my data and services I use in my day to day life. Most of this is still growing as I add more and more services. 
 
 ### Backend Services
 
-- Traefik - Reverse Proxy
-- Authelia - Private Forward Authentication
-- Portainer - Container Management
-- Organizr - Unified Frontend
-- Heimdall - Unified Frontend Alternative
+- Traefik
+- Authelia
+- Portainer
 
-### Webfronts
+### Web Fronts
 
 - Organizr
 - Heimdall
@@ -30,17 +28,15 @@ The apps I use are scattered around in five different docker-compose files (on f
 
 ### Media Services
 
-- Tautulli - Previously PlexPy. Plex statistics and monitoring
+- Tautulli
+- Overseerr
+- Jackett
+- Hydra2
+- Deemix
 
-### MEDIA FILE MANAGEMENT
+### Media Servers
 
-- Bazarr - Subtitle Management
-- Picard - Music Library Tagging and Management
-- Handbrake - Video Conversion, Transcoding, and Compression
-- MKVToolNix - Video Editing, Remuxing (changing media container while keeping original source quality)
-- MakeMKV - Video Editing (Ripping from Disks)
-- FileBot - File renamer
-- Tiny Media Manager - Media Files Management
+- Navidrome
 
 ### Databases
 
@@ -48,8 +44,8 @@ The apps I use are scattered around in five different docker-compose files (on f
 
 ### UTILITIES
 
-- UniFi Controller - Controller for Ubiquiti UniFi Network Gear
+- UniFi Controller
 
 ### SMART HOME
 
-- Home Assistant Core - Home Automation
+- Home Assistant
